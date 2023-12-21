@@ -12,7 +12,7 @@ export default function Login() {
 
   const toggleVisibility = () => setIsVisible(!isVisible);
   return (
-    <div className="px-10 py-10 bg-gray-200 min-w-[550px] flex flex-col gap-5">
+    <main className="px-10 py-10 bg-gray-300 min-w-[550px] flex flex-col gap-5">
 
       <div className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4">
         <Input
@@ -49,7 +49,7 @@ export default function Login() {
             className='text-sm'
             size='sm'
             underline='always'
-            href="#">Not a member? Register</Link>
+            href="/auth/register">Not a member? Register</Link>
         </div>
         <Button
           fullWidth
@@ -57,6 +57,6 @@ export default function Login() {
         >Login</Button>
       </div>
 
-    </div>
+    </main>
   )
 }
