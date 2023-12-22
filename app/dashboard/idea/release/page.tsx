@@ -1,6 +1,6 @@
 export default function Release() {
   return (
-    <div>
+    <div className="px-6">
       Release Page
     </div>
   )

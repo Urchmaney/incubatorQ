@@ -6,9 +6,11 @@ import { MailIcon } from '@/components/icons/MailIcon';
 import { Button } from '@nextui-org/button';
 import { Input, Link } from '@nextui-org/react';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation'
 
 export default function Login() {
   const [isVisible, setIsVisible] = useState(false);
+  const router = useRouter();
 
   const toggleVisibility = () => setIsVisible(!isVisible);
   return (
@@ -54,6 +56,7 @@ export default function Login() {
         <Button
           fullWidth
           color='primary'
+          onClick={() => router.push("/dashboard/idea/release")}
         >Login</Button>
       </div>
 
