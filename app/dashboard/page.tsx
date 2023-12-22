@@ -59,8 +59,8 @@ export default function Dashboard() {
                 itemClasses={{
                   base: "gap-4",
                 }}
-                children={[]}
               >
+                <div></div>
                 {/* <DropdownItem
                 key="autoscaling"
                 description="First Idea."
