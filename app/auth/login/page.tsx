@@ -56,7 +56,7 @@ export default function Login() {
         <Button
           fullWidth
           color='primary'
-          onClick={() => router.push("/dashboard/idea/release")}
+          onClick={() => router.push("/dashboard")}
         >Login</Button>
       </div>
 

@@ -1,6 +1,7 @@
 "use client"
 import { BackArrowIcon } from "@/components/icons/BackArrowIcon"
 import { Button, Link, Navbar, NavbarBrand, NavbarContent, NavbarItem } from "@nextui-org/react"
+import { useRouter } from "next/navigation"
 import { useState } from "react"
 
 export default function IdeaLayout({
@@ -9,6 +10,7 @@ export default function IdeaLayout({
   children: React.ReactNode
 }) {
   const [activeMenu, setActiveMenu] = useState("release");
+  const router = useRouter();
 
   const onMenuClick = (val: string) => {
     setActiveMenu(val)
@@ -19,7 +21,7 @@ export default function IdeaLayout({
         <Navbar>
           <NavbarBrand>
             {/* <AcmeLogo /> */}
-            <Button>
+            <Button onClick={() => router.push('/dashboard')}>
               <BackArrowIcon className="" />
               <p className="font-bold text-inherit">IncubatorQ</p>
             </Button>
