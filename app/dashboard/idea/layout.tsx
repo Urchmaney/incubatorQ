@@ -1,7 +1,7 @@
 "use client"
 import { BackArrowIcon } from "@/components/icons/BackArrowIcon"
 import { Button, Link, Navbar, NavbarBrand, NavbarContent, NavbarItem } from "@nextui-org/react"
-import { useRouter } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { useState } from "react"
 
 export default function IdeaLayout({
@@ -9,12 +9,12 @@ export default function IdeaLayout({
 }: {
   children: React.ReactNode
 }) {
-  const [activeMenu, setActiveMenu] = useState("release");
   const router = useRouter();
 
-  const onMenuClick = (val: string) => {
-    setActiveMenu(val)
-  }
+
+  let pathname = usePathname()
+  pathname = pathname.split('/')[3]
+
   return (
     <div>
       <div>
@@ -45,28 +45,28 @@ export default function IdeaLayout({
             </NavbarItem>
           </NavbarContent> */}
           <NavbarContent justify="end">
-            <NavbarItem isActive={activeMenu === 'mentor'}>
-              <Link color="foreground" aria-current="page" href="#" onClick={() => onMenuClick('mentor')}>
+            <NavbarItem isActive={pathname === 'mentor'}>
+              <Link color="foreground" aria-current="page" href="#">
                 Book a Mentor / Expert
               </Link>
             </NavbarItem>
-            <NavbarItem className="hidden lg:flex" isActive={activeMenu === 'release'}>
-              <Button as={Link} href="/dashboard/idea/release" variant="flat" color={activeMenu === 'release' ? `primary` : 'default'} onClick={() => onMenuClick('release')}>Releases</Button>
+            <NavbarItem className="hidden lg:flex" isActive={pathname === 'release'}>
+              <Button as={Link} href="/dashboard/idea/release" variant="flat" color={pathname === 'release' ? `primary` : 'default'}>Releases</Button>
             </NavbarItem>
-            <NavbarItem isActive={activeMenu === 'assumpt'}>
-              <Button as={Link} href="/dashboard/idea/assumptions" variant="flat" color={activeMenu === 'assumpt' ? `primary` : 'default'} onClick={() => onMenuClick('assumpt')}>
+            <NavbarItem isActive={pathname === 'assumptions'}>
+              <Button as={Link} href="/dashboard/idea/assumptions" variant="flat" color={pathname === 'assumptions' ? `primary` : 'default'} >
                 Assumptions
               </Button>
             </NavbarItem>
 
-            <NavbarItem isActive={activeMenu === 'learn'}>
-              <Button as={Link} href="/dashboard/idea/learnings" variant="flat" color={activeMenu === 'learn' ? `primary` : 'default'}  onClick={() => onMenuClick('learn')}>
+            <NavbarItem isActive={pathname === 'learnings'}>
+              <Button as={Link} href="/dashboard/idea/learnings" variant="flat" color={pathname === 'learnings' ? `primary` : 'default'} >
                 Learnings
               </Button>
             </NavbarItem>
 
-            <NavbarItem isActive={activeMenu === 'problem'}>
-              <Button as={Link} href="/dashboard/idea/problem" variant="flat" color={activeMenu === 'problem' ? `primary` : 'default'} onClick={() => onMenuClick('problem')}>
+            <NavbarItem isActive={pathname === 'problem'}>
+              <Button as={Link} href="/dashboard/idea/problem" variant="flat" color={pathname === 'problem' ? `primary` : 'default'}>
                 Problem
               </Button>
             </NavbarItem>
