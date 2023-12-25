@@ -51,22 +51,22 @@ export default function IdeaLayout({
               </Link>
             </NavbarItem>
             <NavbarItem className="hidden lg:flex" isActive={activeMenu === 'release'}>
-              <Button as={Link} href="#" variant="flat" color={activeMenu === 'release' ? `primary` : 'default'} onClick={() => onMenuClick('release')}>Releases</Button>
+              <Button as={Link} href="/dashboard/idea/release" variant="flat" color={activeMenu === 'release' ? `primary` : 'default'} onClick={() => onMenuClick('release')}>Releases</Button>
             </NavbarItem>
             <NavbarItem isActive={activeMenu === 'assumpt'}>
-              <Button as={Link} href="#" variant="flat" color={activeMenu === 'assumpt' ? `primary` : 'default'} onClick={() => onMenuClick('assumpt')}>
+              <Button as={Link} href="/dashboard/idea/assumptions" variant="flat" color={activeMenu === 'assumpt' ? `primary` : 'default'} onClick={() => onMenuClick('assumpt')}>
                 Assumptions
               </Button>
             </NavbarItem>
 
             <NavbarItem isActive={activeMenu === 'learn'}>
-              <Button as={Link} href="#" variant="flat" color={activeMenu === 'learn' ? `primary` : 'default'}  onClick={() => onMenuClick('learn')}>
+              <Button as={Link} href="/dashboard/idea/learnings" variant="flat" color={activeMenu === 'learn' ? `primary` : 'default'}  onClick={() => onMenuClick('learn')}>
                 Learnings
               </Button>
             </NavbarItem>
 
             <NavbarItem isActive={activeMenu === 'problem'}>
-              <Button as={Link} href="#" variant="flat" color={activeMenu === 'problem' ? `primary` : 'default'} onClick={() => onMenuClick('problem')}>
+              <Button as={Link} href="/dashboard/idea/problem" variant="flat" color={activeMenu === 'problem' ? `primary` : 'default'} onClick={() => onMenuClick('problem')}>
                 Problem
               </Button>
             </NavbarItem>
