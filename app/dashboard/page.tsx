@@ -77,19 +77,19 @@ export default function Dashboard() {
         </Navbar>
       </div>
       <div className="flex justify-between flex-wrap gap-8 pt-14">
-        <div className="flex justify-center items-center w-[30%] bg-gray-400 h-[290px] rounded-md">
+        <div className="flex justify-center items-center w-[30%] bg-gray-200 h-[290px] rounded-md">
           <Link className="text-xl" href="dashboard/idea/release">InnovatorQ</Link>
         </div>
 
-        <div className="flex justify-center items-center w-[30%] bg-gray-400 h-[290px] rounded-md text-2xl">
+        <div className="flex justify-center items-center w-[30%] bg-gray-200 h-[290px] rounded-md text-2xl">
           <Link className="text-xl" href="dashboard/idea/release">Linsight</Link>
         </div>
 
-        <div className="flex justify-center items-center w-[30%] bg-gray-400 h-[290px] rounded-md text-2xl">
+        <div className="flex justify-center items-center w-[30%] bg-gray-200 h-[290px] rounded-md text-2xl">
           <Link className="text-xl" href="dashboard/idea/release">Pinzera</Link>
         </div>
 
-        <div className="flex justify-center items-center w-[30%] bg-gray-400 h-[290px] rounded-md text-2xl">
+        <div className="flex justify-center items-center w-[30%] bg-gray-200 h-[290px] rounded-md text-2xl">
           <AddIcon className="" />
         </div>
       </div>
