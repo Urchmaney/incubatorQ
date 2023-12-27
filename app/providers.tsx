@@ -1,11 +1,14 @@
 'use client'
 
-import {NextUIProvider} from '@nextui-org/react'
+import { AuthContextProvider } from '@/services/auth/auth.context'
+import { NextUIProvider } from '@nextui-org/react'
 
-export function Providers({children}: { children: React.ReactNode }) {
+export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <NextUIProvider>
-      {children}
+      <AuthContextProvider>
+        {children}
+      </AuthContextProvider>
     </NextUIProvider>
   )
 }

@@ -3,9 +3,13 @@
 import { AddIcon } from "@/components/icons/AddIcon"
 import { BackArrowIcon } from "@/components/icons/BackArrowIcon"
 import { ChevronDown } from "@/components/icons/ChevronIcon"
+import { useAuthContext } from "@/services/auth/auth.context"
 import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Link, Navbar, NavbarBrand, NavbarContent, NavbarItem, User } from "@nextui-org/react"
 
 export default function Dashboard() {
+
+  const {auth} = useAuthContext()
+
   return (
     <div>
       <div>
@@ -13,7 +17,7 @@ export default function Dashboard() {
           <NavbarBrand>
             {/* <AcmeLogo /> */}
             <User
-              name="Jane Doe"
+              name={auth?.user.displayName}
 
               avatarProps={{
                 src: "https://i.pravatar.cc/150?u=a04258114e29026702d"
