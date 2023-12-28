@@ -1,7 +1,8 @@
 export default interface IAuth {
   register(email: string, password: string, fullName: string) : Promise<string[]>
   login(email: string, password: string) : Promise<string[]>
-  user: AppUser
+  logout() : Promise<void>
+  user: AppUser | null
 }
 
 export type AppUser = {

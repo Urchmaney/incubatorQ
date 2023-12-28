@@ -12,7 +12,6 @@ export default function AuthLayout({
 
   const { auth } = useAuthContext();
   const router = useRouter();
-
   useEffect(() => {
     if (auth?.user) {
       router.push('/dashboard');
