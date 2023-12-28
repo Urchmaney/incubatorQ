@@ -28,10 +28,10 @@ export default function Dashboard() {
               name={auth?.user?.displayName}
 
               avatarProps={{
-                src: "https://i.pravatar.cc/150?u=a04258114e29026702d"
+                src: "https://img.freepik.com/premium-vector/user-profile-icon-flat-style-member-avatar-vector-illustration-isolated-background-human-permission-sign-business-concept_157943-15752.jpg?w=740"
               }}
             />
-
+            
           </NavbarBrand>
           {/* <NavbarContent className="hidden sm:flex gap-4" justify="center">
             <NavbarItem>
