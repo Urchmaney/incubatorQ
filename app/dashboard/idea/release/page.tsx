@@ -1,6 +1,9 @@
+"use client"
+import { useAuthContext } from "@/services/auth/auth.context";
 import { Button, Checkbox, CheckboxGroup, Input, Textarea } from "@nextui-org/react";
 
 export default function Release() {
+  const {auth} = useAuthContext();
   return (
     <div className="p-6">
       <div className="flex justify-end">

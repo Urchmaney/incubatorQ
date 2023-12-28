@@ -1,6 +1,7 @@
 "use client"
 import { BackArrowIcon } from "@/components/icons/BackArrowIcon"
-import { Button, Link, Navbar, NavbarBrand, NavbarContent, NavbarItem } from "@nextui-org/react"
+import { Button, Navbar, NavbarBrand, NavbarContent, NavbarItem } from "@nextui-org/react"
+import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { useState } from "react"
 

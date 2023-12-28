@@ -4,11 +4,19 @@ import { AddIcon } from "@/components/icons/AddIcon"
 import { BackArrowIcon } from "@/components/icons/BackArrowIcon"
 import { ChevronDown } from "@/components/icons/ChevronIcon"
 import { useAuthContext } from "@/services/auth/auth.context"
-import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Link, Navbar, NavbarBrand, NavbarContent, NavbarItem, User } from "@nextui-org/react"
+import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Navbar, NavbarBrand, NavbarContent, NavbarItem, User } from "@nextui-org/react"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
 
 export default function Dashboard() {
 
-  const {auth} = useAuthContext()
+  const {auth} = useAuthContext();
+
+  const router = useRouter();
+  const logOut = () => {
+    auth?.logout();
+    router.push('/auth/login');
+  }
 
   return (
     <div>
@@ -17,7 +25,7 @@ export default function Dashboard() {
           <NavbarBrand>
             {/* <AcmeLogo /> */}
             <User
-              name={auth?.user.displayName}
+              name={auth?.user?.displayName}
 
               avatarProps={{
                 src: "https://i.pravatar.cc/150?u=a04258114e29026702d"
@@ -75,8 +83,10 @@ export default function Dashboard() {
               </DropdownMenu>
             </Dropdown>
           </NavbarContent>
-          <NavbarContent>
-
+          <NavbarContent justify="end">
+            <Button onClick={logOut}>
+              Logout
+            </Button>
           </NavbarContent>
         </Navbar>
       </div>

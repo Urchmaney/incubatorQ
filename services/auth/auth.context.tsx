@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
     onAuthStateChanged,
     getAuth,
@@ -16,7 +16,9 @@ export const useAuthContext = () => React.useContext(AuthContext);
 export const AuthContextProvider = ({
     children,
 }: { children: React.ReactNode }) => {
-    const authInstance : IAuth = new FirebaseAuth();
+    
+    const authInstance : IAuth = useMemo(() => new FirebaseAuth(), []);
+
     // const [user, setUser] = React.useState<User | null>(null);
     // const [loading, setLoading] = React.useState(true);
 
