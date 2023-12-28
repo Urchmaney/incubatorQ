@@ -22,7 +22,7 @@ export default function Register() {
       formData.get("full_name")?.toString() || ""
     )
     if (result && result?.length <= 0) {
-      router.push('/dashboard', undefined);
+      router.replace('/dashboard');
     }
   }
 
