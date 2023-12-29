@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import {
-    onAuthStateChanged,
-    getAuth,
+  onAuthStateChanged,
+  getAuth,
 } from 'firebase/auth';
 import firebase_app from '../../firebase.config';
 import IAuth, { AppUser } from './IAuth';
@@ -14,30 +14,30 @@ export const AuthContext: React.Context<{ auth?: IAuth }> = React.createContext(
 export const useAuthContext = () => React.useContext(AuthContext);
 
 export const AuthContextProvider = ({
-    children,
+  children,
 }: { children: React.ReactNode }) => {
-    
-    const authInstance : IAuth = useMemo(() => new FirebaseAuth(), []);
 
-    // const [user, setUser] = React.useState<User | null>(null);
-    // const [loading, setLoading] = React.useState(true);
+  const authInstance: IAuth = useMemo(() => new FirebaseAuth(), []);
 
-    // React.useEffect(() => {
-    //     const unsubscribe = onAuthStateChanged(auth, (user) => {
-    //         if (user) {
-    //             setUser(user);
-    //         } else {
-    //             setUser(null);
-    //         }
-    //         setLoading(false);
-    //     });
+  // const [user, setUser] = React.useState<User | null>(null);
+  // const [loading, setLoading] = React.useState(true);
 
-    //     return () => unsubscribe();
-    // }, []);
+  // React.useEffect(() => {
+  //     const unsubscribe = onAuthStateChanged(auth, (user) => {
+  //         if (user) {
+  //             setUser(user);
+  //         } else {
+  //             setUser(null);
+  //         }
+  //         setLoading(false);
+  //     });
 
-    return (
-        <AuthContext.Provider value={{ auth: authInstance }}>
-          {children}
-        </AuthContext.Provider>
-    );
+  //     return () => unsubscribe();
+  // }, []);
+
+  return (
+    <AuthContext.Provider value={{ auth: authInstance }}>
+      {children}
+    </AuthContext.Provider>
+  );
 };
