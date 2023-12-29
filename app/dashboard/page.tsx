@@ -4,13 +4,14 @@ import { AddIcon } from "@/components/icons/AddIcon"
 import { BackArrowIcon } from "@/components/icons/BackArrowIcon"
 import { ChevronDown } from "@/components/icons/ChevronIcon"
 import { useAuthContext } from "@/services/auth/auth.context"
-import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Navbar, NavbarBrand, NavbarContent, NavbarItem, User } from "@nextui-org/react"
+import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Navbar, NavbarBrand, NavbarContent, NavbarItem, User, useDisclosure } from "@nextui-org/react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 
 export default function Dashboard() {
 
-  const {auth} = useAuthContext();
+  const { auth } = useAuthContext();
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
   const router = useRouter();
   const logOut = () => {
@@ -31,7 +32,7 @@ export default function Dashboard() {
                 src: "https://img.freepik.com/premium-vector/user-profile-icon-flat-style-member-avatar-vector-illustration-isolated-background-human-permission-sign-business-concept_157943-15752.jpg?w=740"
               }}
             />
-            
+
           </NavbarBrand>
           {/* <NavbarContent className="hidden sm:flex gap-4" justify="center">
             <NavbarItem>
@@ -72,14 +73,14 @@ export default function Dashboard() {
                   base: "gap-4",
                 }}
               >
-                <div></div>
-                {/* <DropdownItem
-                key="autoscaling"
-                description="First Idea."
-                
-              >
-                Autoscaling
-              </DropdownItem> */}
+
+                <DropdownItem
+                  key="autoscaling"
+
+
+                >
+                  Under work
+                </DropdownItem>
               </DropdownMenu>
             </Dropdown>
           </NavbarContent>
@@ -103,8 +104,40 @@ export default function Dashboard() {
           <Link className="text-xl" href="dashboard/idea/release">Pinzera</Link>
         </div>
 
-        <div className="flex justify-center items-center w-[30%] bg-gray-200 h-[290px] rounded-md text-2xl cursor-pointer">
+        <div className="flex justify-center items-center w-[30%] bg-gray-200 h-[290px] rounded-md text-2xl cursor-pointer" onClick={onOpen}>
           <AddIcon className="" />
+
+          <Modal
+            isOpen={isOpen}
+            placement="top"
+            onOpenChange={onOpenChange}
+          >
+            <ModalContent>
+              {(onClose) => (
+                <>
+                  <ModalHeader className="flex flex-col gap-1">Idea</ModalHeader>
+                  <ModalBody>
+                    <Input
+                      type="text"
+                      placeholder=""
+                  
+                      color='primary'
+                      name='ideaname'
+                      id='ideaname'
+                    />
+                  </ModalBody>
+                  <ModalFooter>
+                    <Button color="danger" variant="light" onPress={onClose}>
+                      Close
+                    </Button>
+                    <Button color="primary" onPress={onClose}>
+                      Create
+                    </Button>
+                  </ModalFooter>
+                </>
+              )}
+            </ModalContent>
+          </Modal>
         </div>
       </div>
 
