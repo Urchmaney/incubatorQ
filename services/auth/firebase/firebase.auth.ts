@@ -30,9 +30,8 @@ export class FirebaseAuth implements IAuth {
     } catch (error) {
       return ["Error registering"]
     }
-
-
   }
+
   async login(email: string, password: string): Promise<string[]> {
     try {
       const result = await signInWithEmailAndPassword(this.auth, email, password);
