@@ -1,5 +1,6 @@
 "use client"
 import { BackArrowIcon } from "@/components/icons/BackArrowIcon"
+import { useIdeaContext } from "@/services/repo/idea.context"
 import { Button, Navbar, NavbarBrand, NavbarContent, NavbarItem } from "@nextui-org/react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
@@ -11,9 +12,9 @@ export default function IdeaLayout({
   children: React.ReactNode
 }) {
   const router = useRouter();
+  const { activeIdea } = useIdeaContext();
 
-
-  let pathname = usePathname()
+  let pathname = usePathname();
   pathname = pathname.split('/')[3]
 
   return (
@@ -24,9 +25,9 @@ export default function IdeaLayout({
             {/* <AcmeLogo /> */}
             <Button onClick={() => router.push('/dashboard')}>
               <BackArrowIcon className="" />
-              <p className="font-bold text-inherit">IncubatorQ</p>
+              <p className="font-bold text-inherit">{activeIdea?.name}</p>
             </Button>
-            
+
           </NavbarBrand>
           {/* <NavbarContent className="hidden sm:flex gap-4" justify="center">
             <NavbarItem>
