@@ -9,7 +9,7 @@ import { useIdeaContext } from "@/services/repo/idea.context"
 import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Navbar, NavbarBrand, NavbarContent, NavbarItem, User, useDisclosure } from "@nextui-org/react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { FormEvent, useState } from "react"
+import { FormEvent, useEffect, useState } from "react"
 
 export default function Dashboard() {
 
@@ -25,9 +25,12 @@ export default function Dashboard() {
     router.push('/auth/login');
   }
 
-  ideaRepo?.getUserIdeas(auth?.user?.userId || "").then(data => {
-    setUserIdeas(data);
-  })
+  useEffect(() => {
+    ideaRepo?.getUserIdeas(auth?.user?.userId || "").then(data => {
+      setUserIdeas(data);
+    })
+  }, [userIdeas.length])
+  
 
   const createIdea = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
