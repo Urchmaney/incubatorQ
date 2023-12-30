@@ -1,5 +1,5 @@
 import { ChevronDown } from "@/components/icons/ChevronIcon";
-import { Checkbox, CheckboxGroup } from "@nextui-org/react";
+import { Checkbox, CheckboxGroup, Input } from "@nextui-org/react";
 
 export default function Assumptions() {
   return (
@@ -23,7 +23,14 @@ export default function Assumptions() {
             <Checkbox value="sydney">Sydney</Checkbox>
             <Checkbox value="san-francisco">San Francisco</Checkbox>
             <Checkbox value="london">London</Checkbox>
-            <Checkbox value="tokyo">Tokyo</Checkbox>
+            <div>
+              <Input
+                type="text"
+                color='primary'
+                name='newAssumption'
+                id='newAssumption'
+              />
+            </div>
           </CheckboxGroup>
         </div>
       </div>

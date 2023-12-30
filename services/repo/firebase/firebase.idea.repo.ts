@@ -1,5 +1,5 @@
 import { Firestore, QueryDocumentSnapshot, addDoc, collection, doc, getDoc, getDocs, getFirestore, query, setDoc, where } from "firebase/firestore";
-import IAppRepo, { Idea } from "../IAppRepo";
+import IAppRepo, { Idea, Learning } from "../IAppRepo";
 import firebase_app from "@/firebase.config";
 
 
@@ -12,8 +12,35 @@ export class FirebaseIdeaRepo implements IAppRepo {
     toFirestore: (data: Partial<Idea>) => data
   }
 
+  readonly FIREBASE_LEARNING_CONVERTER = {
+    fromFirestore: (snap: QueryDocumentSnapshot) => snap.data() as Learning,
+    toFirestore: (data: Partial<Learning>) => data
+  }
+
   constructor() {
     this.appFirestore = getFirestore(firebase_app)
+  }
+  async addIdeaLearning(ideaId: string, learning: string): Promise<void> {
+    try {
+      const data = { content: learning }
+      const collectionRef = collection(this.appFirestore, `${this.IDEA_COLLECTION}/${ideaId}/learnings`).withConverter(this.FIREBASE_LEARNING_CONVERTER)
+      await addDoc(collectionRef, data);
+    } catch(error) {
+      console.log(error)
+    }
+  }
+
+  async getIdeaLearnings(ideaId: string): Promise<Learning[]> {
+    try {
+      const collectionRef = collection(this.appFirestore, `${this.IDEA_COLLECTION}/${ideaId}/learnings`).withConverter(this.FIREBASE_LEARNING_CONVERTER);
+      const snapshot = await getDocs(collectionRef);
+      return snapshot.docs.map(x => ({ id: x.id, content: x.data().content }) as Learning)
+    } catch(error) {
+      console.log(error)
+      return []
+    }
+    
+
   }
 
   async updateIdeaProperties(ideaId: string, properties: Partial<{ description: string, problem: string }>): Promise<void> {
