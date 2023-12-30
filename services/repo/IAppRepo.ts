@@ -4,6 +4,9 @@ export default interface IAppRepo {
   updateIdeaProperties(ideaId: string, properties: Partial<{ description: string, problem: string }>) : Promise<void>
   addIdeaLearning(ideaId: string, learning: string): Promise<void>
   getIdeaLearnings(ideaId: string): Promise<Learning[]>
+
+  addIdeaAssumption(ideaId: string, learning: string): Promise<Partial<{ id: string, error: string }>>
+  getIdeaAssumptions(ideaId: string): Promise<Assumption[]>
 }
 
 
@@ -15,6 +18,11 @@ export type Idea = {
 }
 
 export type Learning = {
+  id: string
+  content: string
+}
+
+export type Assumption = {
   id: string
   content: string
 }
