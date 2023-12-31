@@ -1,5 +1,5 @@
 import { Firestore, QueryDocumentSnapshot, addDoc, collection, doc, getDoc, getDocs, getFirestore, query, setDoc, where } from "firebase/firestore";
-import IAppRepo, { Idea } from "../IAppRepo";
+import IAppRepo, { Assumption, Idea, Learning } from "../IAppRepo";
 import firebase_app from "@/firebase.config";
 
 
@@ -12,8 +12,63 @@ export class FirebaseIdeaRepo implements IAppRepo {
     toFirestore: (data: Partial<Idea>) => data
   }
 
+  readonly FIREBASE_LEARNING_CONVERTER = {
+    fromFirestore: (snap: QueryDocumentSnapshot) => snap.data() as Learning,
+    toFirestore: (data: Partial<Learning>) => data
+  }
+
+  readonly FIREBASE_ASSUMPTION_CONVERTER = {
+    fromFirestore: (snap: QueryDocumentSnapshot) => snap.data() as Assumption,
+    toFirestore: (data: Partial<Assumption>) => data
+  }
+
+
   constructor() {
     this.appFirestore = getFirestore(firebase_app)
+  }
+  async addIdeaAssumption(ideaId: string, assumption: string): Promise<Partial<{ id: string, error: string }>> {
+    try {
+      const data = { content: assumption }
+      const collectionRef = collection(this.appFirestore, `${this.IDEA_COLLECTION}/${ideaId}/assumptions`).withConverter(this.FIREBASE_ASSUMPTION_CONVERTER)
+      const result = await addDoc(collectionRef, data);
+      return { id: result.id }
+    } catch(error) {
+      console.log(error)
+      return { error: "Error adding assumptions" }
+    }
+  }
+  async getIdeaAssumptions(ideaId: string): Promise<Assumption[]> {
+    try {
+      const collectionRef = collection(this.appFirestore, `${this.IDEA_COLLECTION}/${ideaId}/assumptions`).withConverter(this.FIREBASE_ASSUMPTION_CONVERTER);
+      const snapshot = await getDocs(collectionRef);
+      return snapshot.docs.map(x => ({ id: x.id, content: x.data().content }) as Assumption)
+    } catch(error) {
+      console.log(error)
+      return []
+    }
+  }
+  
+  async addIdeaLearning(ideaId: string, learning: string): Promise<void> {
+    try {
+      const data = { content: learning }
+      const collectionRef = collection(this.appFirestore, `${this.IDEA_COLLECTION}/${ideaId}/learnings`).withConverter(this.FIREBASE_LEARNING_CONVERTER)
+      await addDoc(collectionRef, data);
+    } catch(error) {
+      console.log(error)
+    }
+  }
+
+  async getIdeaLearnings(ideaId: string): Promise<Learning[]> {
+    try {
+      const collectionRef = collection(this.appFirestore, `${this.IDEA_COLLECTION}/${ideaId}/learnings`).withConverter(this.FIREBASE_LEARNING_CONVERTER);
+      const snapshot = await getDocs(collectionRef);
+      return snapshot.docs.map(x => ({ id: x.id, content: x.data().content }) as Learning)
+    } catch(error) {
+      console.log(error)
+      return []
+    }
+    
+
   }
 
   async updateIdeaProperties(ideaId: string, properties: Partial<{ description: string, problem: string }>): Promise<void> {
