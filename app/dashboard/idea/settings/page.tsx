@@ -1,8 +1,10 @@
 "use client"
 import { AddIcon } from "@/components/icons/AddIcon";
 import { CommentIcon } from "@/components/icons/CommentIcon";
+import { useAuthContext } from "@/services/auth/auth.context";
+import { useIdeaContext } from "@/services/repo/idea.context";
 import { Button, Card, CardBody, CardFooter, CardHeader, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Textarea, useDisclosure } from "@nextui-org/react";
-import { useState } from "react";
+import { FormEvent, useState } from "react";
 
 function StepCard({ expanded = false, indicator = true, styles = "" }: { expanded: boolean, indicator: boolean, styles: string }) {
   const [xpanded, setXpanded] = useState(expanded)
@@ -69,6 +71,8 @@ function JourneyCard() {
 }
 
 function CreateJourney() {
+  const { ideaRepo } = useIdeaContext();
+  const { auth } = useAuthContext();
   const [goals, setGoals] = useState([""])
   const changeText = (value: string, index: number) => {
     goals[index] = value
@@ -76,7 +80,7 @@ function CreateJourney() {
     const lastVal = newGoals[newGoals.length - 1];
 
     if (newGoals.length > 2) {
-      while (!newGoals[newGoals.length - 1] && !newGoals[newGoals.length - 2]) {
+      while (!newGoals[newGoals.length - 1] && !newGoals[newGoals.length - 2] && newGoals.length > 2) {
         newGoals.pop();
       }
     }
@@ -86,13 +90,29 @@ function CreateJourney() {
     }
     setGoals(newGoals)
   }
+
+
+  const addJourney = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    const formData = new FormData(event.currentTarget);
+    goals.pop();
+    ideaRepo?.createUserJourney(
+      auth?.user?.userId || "", 
+      {
+        pmfDescription: formData.get('pmf')?.toString() || "",
+        steps: goals,
+      }
+    )
+    
+  }
   return (
     <div>
-      <form onSubmit={() => { }}>
+      <form onSubmit={addJourney}>
         <Card>
           <CardHeader>
             <div className="w-full">
-              <h1>Create Journey</h1>
+              <h1 className="font-bold mb-3">Create Journey</h1>
               <Textarea
                 defaultValue={""}
                 className="max-w-full"
@@ -179,6 +199,7 @@ export default function Settings() {
           isOpen={isOpen}
           placement="top"
           onOpenChange={onOpenChange}
+          size="3xl"
         >
           <ModalContent>
             {(onClose) => (
