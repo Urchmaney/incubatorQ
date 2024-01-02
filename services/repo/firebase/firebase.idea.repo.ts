@@ -1,11 +1,12 @@
 import { Firestore, QueryDocumentSnapshot, addDoc, collection, doc, getDoc, getDocs, getFirestore, query, setDoc, where } from "firebase/firestore";
-import IAppRepo, { Assumption, Idea, Learning } from "../IAppRepo";
+import IAppRepo, { Assumption, Idea, Journey, Learning } from "../IAppRepo";
 import firebase_app from "@/firebase.config";
 
 
 export class FirebaseIdeaRepo implements IAppRepo {
   private appFirestore: Firestore
   readonly IDEA_COLLECTION: string = "ideas"
+  readonly JOURNEY_COLLECTION: string = "journeys"
 
   readonly FIREBASE_IDEA_CONVERTER = {
     fromFirestore: (snap: QueryDocumentSnapshot) => snap.data() as Idea,
@@ -22,17 +23,36 @@ export class FirebaseIdeaRepo implements IAppRepo {
     toFirestore: (data: Partial<Assumption>) => data
   }
 
+  readonly FIREBASE_JOURNEY_CONVERTER = {
+    fromFirestore: (snap: QueryDocumentSnapshot) => snap.data() as Journey,
+    toFirestore: (data: Partial<Journey>) => data
+  }
+
 
   constructor() {
     this.appFirestore = getFirestore(firebase_app)
   }
+
+  async createUserJourney(userId: string, journey: Partial<Journey>): Promise<Partial<{ journeyId: string, error: string }>> {
+    try {
+      const data = { userId, ...journey }
+      const collectionRef = collection(this.appFirestore, this.JOURNEY_COLLECTION).withConverter(this.FIREBASE_JOURNEY_CONVERTER)
+      const result = await addDoc(collectionRef, data);
+      return { journeyId: result.id }
+    } catch (error) {
+      console.log(error)
+      return { error: "Error adding assumptions" }
+    }
+  }
+
+
   async addIdeaAssumption(ideaId: string, assumption: string): Promise<Partial<{ id: string, error: string }>> {
     try {
       const data = { content: assumption }
       const collectionRef = collection(this.appFirestore, `${this.IDEA_COLLECTION}/${ideaId}/assumptions`).withConverter(this.FIREBASE_ASSUMPTION_CONVERTER)
       const result = await addDoc(collectionRef, data);
       return { id: result.id }
-    } catch(error) {
+    } catch (error) {
       console.log(error)
       return { error: "Error adding assumptions" }
     }
@@ -42,18 +62,18 @@ export class FirebaseIdeaRepo implements IAppRepo {
       const collectionRef = collection(this.appFirestore, `${this.IDEA_COLLECTION}/${ideaId}/assumptions`).withConverter(this.FIREBASE_ASSUMPTION_CONVERTER);
       const snapshot = await getDocs(collectionRef);
       return snapshot.docs.map(x => ({ id: x.id, content: x.data().content }) as Assumption)
-    } catch(error) {
+    } catch (error) {
       console.log(error)
       return []
     }
   }
-  
+
   async addIdeaLearning(ideaId: string, learning: string): Promise<void> {
     try {
       const data = { content: learning }
       const collectionRef = collection(this.appFirestore, `${this.IDEA_COLLECTION}/${ideaId}/learnings`).withConverter(this.FIREBASE_LEARNING_CONVERTER)
       await addDoc(collectionRef, data);
-    } catch(error) {
+    } catch (error) {
       console.log(error)
     }
   }
@@ -63,11 +83,11 @@ export class FirebaseIdeaRepo implements IAppRepo {
       const collectionRef = collection(this.appFirestore, `${this.IDEA_COLLECTION}/${ideaId}/learnings`).withConverter(this.FIREBASE_LEARNING_CONVERTER);
       const snapshot = await getDocs(collectionRef);
       return snapshot.docs.map(x => ({ id: x.id, content: x.data().content }) as Learning)
-    } catch(error) {
+    } catch (error) {
       console.log(error)
       return []
     }
-    
+
 
   }
 
