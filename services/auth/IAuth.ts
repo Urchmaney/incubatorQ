@@ -7,4 +7,5 @@ export default interface IAuth {
 
 export type AppUser = {
   displayName: string
+  userId: string
 }

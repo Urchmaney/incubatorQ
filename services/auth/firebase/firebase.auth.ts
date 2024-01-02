@@ -7,15 +7,20 @@ export class FirebaseAuth implements IAuth {
   private auth: Auth
   private firebase_user: User | null = null
 
-  get user() : AppUser | null {
-    if (this.firebase_user) {
-      return { displayName: this.firebase_user?.displayName || "" }
-    }
-    return null
-  }
   constructor() {
     this.auth = getAuth(firebase_app)
   }
+
+  get user() : AppUser | null {
+    if (this.firebase_user) {
+      return { 
+        displayName: this.firebase_user?.displayName || "",
+        userId: this.firebase_user.uid      
+      }
+    }
+    return null
+  }
+ 
   async register(email: string, password: string, full_name: string): Promise<string[]> {
     try {
       const result = await createUserWithEmailAndPassword(this.auth, email, password)
@@ -25,9 +30,8 @@ export class FirebaseAuth implements IAuth {
     } catch (error) {
       return ["Error registering"]
     }
-
-
   }
+
   async login(email: string, password: string): Promise<string[]> {
     try {
       const result = await signInWithEmailAndPassword(this.auth, email, password);
