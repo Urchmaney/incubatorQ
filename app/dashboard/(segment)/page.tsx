@@ -20,17 +20,19 @@ export default function Dashboard() {
 
   const [userIdeas, setUserIdeas] = useState<Partial<Idea>[]>([])
 
-  const logOut = () => {
-    auth?.logout();
-    router.push('/auth/login');
-  }
-
   useEffect(() => {
     ideaRepo?.getUserIdeas(auth?.user?.userId || "").then(data => {
       setUserIdeas(data);
     })
   }, [userIdeas.length])
-  
+
+  useEffect(() => {
+    if (auth?.user) {
+      return;
+    }
+
+    router.push('/auth/login')
+  }, [])
 
   const createIdea = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -50,76 +52,7 @@ export default function Dashboard() {
 
   return (
     <div>
-      <div>
-        <Navbar>
-          <NavbarBrand>
-            {/* <AcmeLogo /> */}
-            <User
-              name={auth?.user?.displayName}
-
-              avatarProps={{
-                src: "https://img.freepik.com/premium-vector/user-profile-icon-flat-style-member-avatar-vector-illustration-isolated-background-human-permission-sign-business-concept_157943-15752.jpg?w=740"
-              }}
-            />
-
-          </NavbarBrand>
-          {/* <NavbarContent className="hidden sm:flex gap-4" justify="center">
-            <NavbarItem>
-              <Link color="foreground" href="#">
-                Features
-              </Link>
-            </NavbarItem>
-            <NavbarItem isActive>
-              <Link href="#" aria-current="page">
-                Customers
-              </Link>
-            </NavbarItem>
-            <NavbarItem>
-              <Link color="foreground" href="#">
-                Integrations
-              </Link>
-            </NavbarItem>
-          </NavbarContent> */}
-          <NavbarContent justify="center">
-            <Dropdown>
-              <NavbarItem>
-                <DropdownTrigger>
-                  <Button
-                    disableRipple
-                    className="p-0 bg-transparent data-[hover=true]:bg-transparent"
-                    endContent={<ChevronDown fill="currentColor" size={16} />}
-                    radius="sm"
-                    variant="light"
-                  >
-                    Ideas
-                  </Button>
-                </DropdownTrigger>
-              </NavbarItem>
-              <DropdownMenu
-                aria-label="Ideas"
-                className="w-[340px]"
-                itemClasses={{
-                  base: "gap-4",
-                }}
-              >
-
-                <DropdownItem
-                  key="autoscaling"
-
-
-                >
-                  Under work
-                </DropdownItem>
-              </DropdownMenu>
-            </Dropdown>
-          </NavbarContent>
-          <NavbarContent justify="end">
-            <Button onClick={logOut}>
-              Logout
-            </Button>
-          </NavbarContent>
-        </Navbar>
-      </div>
+      
       <div className="flex justify-start flex-wrap gap-8 pt-14">
         {
           userIdeas.map(x => (
