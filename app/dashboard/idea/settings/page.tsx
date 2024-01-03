@@ -1,26 +1,31 @@
-"use client"
+"use client";
+
 import { AddIcon } from "@/components/icons/AddIcon";
 import { CommentIcon } from "@/components/icons/CommentIcon";
 import { useAuthContext } from "@/services/auth/auth.context";
+import { Journey } from "@/services/repo/IAppRepo";
 import { useIdeaContext } from "@/services/repo/idea.context";
 import { Button, Card, CardBody, CardFooter, CardHeader, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Textarea, useDisclosure } from "@nextui-org/react";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 
-function StepCard({ expanded = false, indicator = true, styles = "" }: { expanded: boolean, indicator: boolean, styles: string }) {
+function StepCard({
+  expanded = false, indicator = true, styles = "", text = "", left = "", indicatorLength = ""
+}: { expanded: boolean, indicator: boolean, styles: string, text: string, left: string, indicatorLength: string }) {
+
   const [xpanded, setXpanded] = useState(expanded)
   return (
-    <div className={`relative cursor-pointer max-w-2xl pb-4 ${styles}`} onClick={() => setXpanded(!xpanded)}>
+    <div className={`relative cursor-pointer max-w-2xl pb-4 ${styles}`} style={{ left: left }} onClick={() => setXpanded(!xpanded)}>
       <Card>
         <CardBody>
-          <p className={`${xpanded ? 'h-24' : ''}`}>Start (Idea)</p>
+          <p className={`${xpanded ? 'h-24' : ''}`}>{text}</p>
         </CardBody>
       </Card>
-      {indicator && <div className="absolute h-10 w-4 border-dotted border-l-2 border-b-2 left-12"></div>}
+      {indicator && <div className={`absolute h-10 border-dotted border-l-2 border-b-2 left-12`} style={{ width: indicatorLength }}></div>}
     </div>
   )
 }
 
-function JourneyCard() {
+function JourneyCard({ journey }: { journey: Journey }) {
   return (
     <Card>
       <CardHeader>
@@ -28,7 +33,7 @@ function JourneyCard() {
           <Textarea
             label="When have you reached product market fit?"
             labelPlacement="outside"
-
+            value={journey.pmfDescription}
             className="max-w-full"
           />
         </div>
@@ -36,10 +41,20 @@ function JourneyCard() {
       </CardHeader>
       <CardBody>
 
-        <div className="py-3 pl-10">
-          <StepCard expanded={false} indicator styles="" />
+        <div className="py-3 pl-10 le">
+          {
+            journey.steps.map((x, i) => {
+              // const v = `left-[calc((${i}*(100%-675px))/${journey.steps.length})]`
+              const v = `calc((${i}*(100% - 675px))/${journey.steps.length})`
+              const iLength = `calc(675px / ${journey.steps.length})`
+              return (
+                <StepCard key={`journey-step-${i}`} expanded={false} indicator={i < journey.steps.length - 1} styles={`relative`} text={x} left={v} indicatorLength={iLength} />
+              )
+            })
+          }
 
 
+          {/* 
           <StepCard expanded indicator styles="relative  left-16 w-[calc(100%-64px)]" />
 
 
@@ -48,11 +63,8 @@ function JourneyCard() {
 
 
 
-          <StepCard expanded={false} indicator={false} styles="relative left-48 w-[calc(100%-192px)]" />
+          <StepCard expanded={false} indicator={false} styles="relative left-48 w-[calc(100%-192px)]" /> */}
         </div>
-
-
-
       </CardBody>
 
       <CardFooter>
@@ -98,13 +110,13 @@ function CreateJourney() {
     const formData = new FormData(event.currentTarget);
     goals.pop();
     ideaRepo?.createUserJourney(
-      auth?.user?.userId || "", 
+      auth?.user?.userId || "",
       {
         pmfDescription: formData.get('pmf')?.toString() || "",
-        steps: goals,
+        steps: ["Idea", ...goals, "Product Market Fit"],
       }
     )
-    
+
   }
   return (
     <div>
@@ -191,6 +203,17 @@ function CreateJourney() {
 
 export default function Settings() {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const { ideaRepo } = useIdeaContext();
+
+  const [journeys, setJourneys] = useState<Journey[]>([]);
+
+  useEffect(() => {
+    ideaRepo?.getJourneys().then(x => {
+      setJourneys(x);
+    })
+  }, [journeys.length])
+
+
   return (
     <div>
       <div className="flex justify-end items-center px-6">
@@ -231,9 +254,14 @@ export default function Settings() {
         </Modal>
       </div>
       <div className="p-6 pt-10 flex flex-col gap-8">
+        {
+          journeys.map((x, i) => (
+            <JourneyCard journey={x} key={`journey-${i}`} />
+          ))
 
-        <JourneyCard />
-        <JourneyCard />
+        }
+
+        {/* <JourneyCard journey={({ pmfDescription: "rANDDDD", steps: ["iDEA", "Product Market Fit"], id: "", userId: "" })} /> */}
 
         {/* <Card>
           <CardHeader>
