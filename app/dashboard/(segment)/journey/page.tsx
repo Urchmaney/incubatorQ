@@ -6,6 +6,7 @@ import { useAuthContext } from "@/services/auth/auth.context";
 import { Journey } from "@/services/repo/IAppRepo";
 import { useIdeaContext } from "@/services/repo/idea.context";
 import { Button, Card, CardBody, CardFooter, CardHeader, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Textarea, useDisclosure } from "@nextui-org/react";
+import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
 
 function StepCard({
@@ -204,7 +205,9 @@ function CreateJourney() {
 export default function Journeys() {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const { ideaRepo } = useIdeaContext();
+  const { auth } = useAuthContext();
 
+  const router = useRouter();
   const [journeys, setJourneys] = useState<Journey[]>([]);
 
   useEffect(() => {
@@ -213,11 +216,18 @@ export default function Journeys() {
     })
   }, [journeys.length])
 
+  const openCreateJourneyModal = () => {
+    if (!auth?.user) {
+        router.push('/auth/login')
+    }
+    onOpen();
+  }
+
 
   return (
     <div>
       <div className="flex justify-end items-center px-6">
-        <Button variant="light" isIconOnly onClick={onOpen}> <AddIcon className="h-6 w-6" /></Button>
+        <Button variant="light" isIconOnly onClick={openCreateJourneyModal}> <AddIcon className="h-6 w-6" /></Button>
         <Modal
           isOpen={isOpen}
           placement="top"
