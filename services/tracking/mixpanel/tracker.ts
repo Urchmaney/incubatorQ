@@ -4,26 +4,25 @@ import IProductTracking, { TrackingEvent } from "../IProductTracking";
 export class MixpanelTracker implements IProductTracking {
   private static _instance: MixpanelTracker
 
-  public static getInstance():  MixpanelTracker {
+  public static getInstance(): MixpanelTracker {
     if (!MixpanelTracker._instance) {
-      return (MixpanelTracker._instance =  new MixpanelTracker())
+      return (MixpanelTracker._instance = new MixpanelTracker())
     }
 
     return this._instance
   }
 
   constructor() {
-    if(!MixpanelTracker._instance) {
+    if (MixpanelTracker._instance) {
       throw new Error("Multiple initializing Tracker...")
     }
 
-    mixpanel.init("", {
-
+    mixpanel.init(process.env.NEXT_PUBLIC_MIXPANEL_ID || "", {
+      debug: ((process.env.NEXT_PUBLIC_MIXPANEL_ID || "dev") === "dev")
     })
   }
 
   private trackObject(event: string, data: object = {}) {
-
     mixpanel.track(event, data)
   }
 
