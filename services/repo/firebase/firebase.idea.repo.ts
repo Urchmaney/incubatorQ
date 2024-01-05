@@ -32,6 +32,17 @@ export class FirebaseIdeaRepo implements IAppRepo {
   constructor() {
     this.appFirestore = getFirestore(firebase_app)
   }
+  
+  async getJourneys(): Promise<Journey[]> {
+    try {
+      const collectionRef = collection(this.appFirestore, this.JOURNEY_COLLECTION).withConverter(this.FIREBASE_JOURNEY_CONVERTER);
+      const snapshot = await getDocs(collectionRef);
+      return snapshot.docs.map(x => ({ id: x.id, ...x.data() }) as Journey)
+    } catch (error) {
+      console.log(error)
+      return []
+    }
+  }
 
   async createUserJourney(userId: string, journey: Partial<Journey>): Promise<Partial<{ journeyId: string, error: string }>> {
     try {
