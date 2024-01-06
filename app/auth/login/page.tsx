@@ -17,7 +17,7 @@ export default function Login() {
 
   useEffect(() => {
     tracker?.trackLoginPageView();
-  }, [])
+  }, [tracker])
 
   const loginUser = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();

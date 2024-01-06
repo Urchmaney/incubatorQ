@@ -16,7 +16,7 @@ export default function AuthLayout({
     if (auth?.user) {
       router.push('/dashboard');
     }
-  }, [])
+  }, [auth?.user])
   return (
     <div className="w-full h-screen flex justify-center items-center">
       <div>

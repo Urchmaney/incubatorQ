@@ -17,7 +17,7 @@ export default function Register() {
 
   useEffect(() => {
     tracker?.trackRegisterPageView();
-  }, [])
+  }, [tracker])
 
   const RegisterUser = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();

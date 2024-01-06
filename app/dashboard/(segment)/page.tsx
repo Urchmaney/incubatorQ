@@ -34,7 +34,7 @@ export default function Dashboard() {
     }
 
     router.push('/auth/login')
-  }, [])
+  }, [auth?.user])
 
   const createIdea = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
