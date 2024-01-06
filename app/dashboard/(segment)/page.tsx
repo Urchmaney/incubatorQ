@@ -6,6 +6,7 @@ import { ChevronDown } from "@/components/icons/ChevronIcon"
 import { useAuthContext } from "@/services/auth/auth.context"
 import { Idea } from "@/services/repo/IAppRepo"
 import { useIdeaContext } from "@/services/repo/idea.context"
+import { useTrackingContext } from "@/services/tracking/trackering.context"
 import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Navbar, NavbarBrand, NavbarContent, NavbarItem, User, useDisclosure } from "@nextui-org/react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -16,6 +17,7 @@ export default function Dashboard() {
   const { auth } = useAuthContext();
   const { ideaRepo, setActiveIdea } = useIdeaContext();
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const { tracker } = useTrackingContext();
   const router = useRouter();
 
   const [userIdeas, setUserIdeas] = useState<Partial<Idea>[]>([])
@@ -40,8 +42,14 @@ export default function Dashboard() {
     const result = await ideaRepo?.createUserIdea(auth?.user?.userId || "", formData.get("ideaname")?.toString() || "")
     if (result?.idea) {
       setActiveIdea?.(result.idea);
+      tracker?.trackCreateNewIdeaClicked();
       router.push('/dashboard/idea/problem')
     }
+  }
+
+  const openNewIdeaModal = () => {
+    onOpen();
+    tracker?.trackAddIdeaClicked();
   }
 
 
@@ -73,7 +81,7 @@ export default function Dashboard() {
           <Link className="text-xl" href="dashboard/idea/release">Pinzera</Link>
         </div> */}
 
-        <div className="flex justify-center items-center w-[30%] bg-gray-200 h-[290px] rounded-md text-2xl cursor-pointer" onClick={onOpen}>
+        <div className="flex justify-center items-center w-[30%] bg-gray-200 h-[290px] rounded-md text-2xl cursor-pointer" onClick={ openNewIdeaModal }>
           <AddIcon className="" />
 
           <Modal

@@ -29,6 +29,8 @@ export default function Login() {
     )
 
     if (errors && errors?.length <= 0) {
+      tracker?.identifyAsLoggedInUser(auth?.user?.userId!);
+      tracker?.trackLoginClicked();
       router.push('/dashboard');
     }
   }

@@ -5,6 +5,7 @@ import { CommentIcon } from "@/components/icons/CommentIcon";
 import { useAuthContext } from "@/services/auth/auth.context";
 import { Journey } from "@/services/repo/IAppRepo";
 import { useIdeaContext } from "@/services/repo/idea.context";
+import { useTrackingContext } from "@/services/tracking/trackering.context";
 import { Button, Card, CardBody, CardFooter, CardHeader, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Textarea, useDisclosure } from "@nextui-org/react";
 import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
@@ -27,6 +28,7 @@ function StepCard({
 }
 
 function JourneyCard({ journey }: { journey: Journey }) {
+    const { tracker } = useTrackingContext();
   return (
     <Card>
       <CardHeader>
@@ -70,10 +72,10 @@ function JourneyCard({ journey }: { journey: Journey }) {
 
       <CardFooter>
         <div className="flex justify-end w-full items-end px-10 gap-5">
-          <Button color="primary">
+          <Button color="primary" onClick={() => tracker?.trackUseIdeaClicked(journey.id) }>
             Use for an Idea
           </Button>
-          <Button>
+          <Button onClick={() => tracker?.trackCommentJourney(journey.id) }>
             Comment <CommentIcon fill="#000" width={30} height={30} size={30} />
           </Button>
 
@@ -206,6 +208,7 @@ export default function Journeys() {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const { ideaRepo } = useIdeaContext();
   const { auth } = useAuthContext();
+  const { tracker } = useTrackingContext();
 
   const router = useRouter();
   const [journeys, setJourneys] = useState<Journey[]>([]);
@@ -216,10 +219,15 @@ export default function Journeys() {
     })
   }, [journeys.length])
 
+  useEffect(() => {
+    tracker?.trackJourneyPageViewed();
+  }, [])
+
   const openCreateJourneyModal = () => {
     if (!auth?.user) {
         router.push('/auth/login')
     }
+    tracker?.trackAddNewJourney()
     onOpen();
   }
 
