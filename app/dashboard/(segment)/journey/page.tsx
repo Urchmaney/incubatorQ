@@ -1,10 +1,14 @@
 "use client";
 
 import { AddIcon } from "@/components/icons/AddIcon";
+import { ChevronDownIcon } from "@/components/icons/ChevronDownIcon";
+import { ChevronDown } from "@/components/icons/ChevronIcon";
+import { ChevronSideIcon } from "@/components/icons/ChevronSideIcon";
 import { CommentIcon } from "@/components/icons/CommentIcon";
 import { useAuthContext } from "@/services/auth/auth.context";
 import { Journey } from "@/services/repo/IAppRepo";
 import { useIdeaContext } from "@/services/repo/idea.context";
+import { useTrackingContext } from "@/services/tracking/trackering.context";
 import { Button, Card, CardBody, CardFooter, CardHeader, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Textarea, useDisclosure } from "@nextui-org/react";
 import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
@@ -18,7 +22,15 @@ function StepCard({
     <div className={`relative cursor-pointer max-w-2xl pb-4 ${styles}`} style={{ left: left }} onClick={() => setXpanded(!xpanded)}>
       <Card>
         <CardBody>
-          <p className={`${xpanded ? 'h-24' : ''}`}>{text}</p>
+          <div className="flex gap-3">
+            <div className="pt-1">
+              {xpanded && <ChevronDownIcon fill={"#000"} size={15} /> }
+              { !xpanded && <ChevronSideIcon fill={"#000"} size={15} /> }
+            </div>
+
+            <p className={`${xpanded ? 'min-h-unit-24' : ''}`}>{text}</p>
+          </div>
+
         </CardBody>
       </Card>
       {indicator && <div className={`absolute h-10 border-dotted border-l-2 border-b-2 left-12`} style={{ width: indicatorLength }}></div>}
@@ -27,6 +39,7 @@ function StepCard({
 }
 
 function JourneyCard({ journey }: { journey: Journey }) {
+  const { tracker } = useTrackingContext();
   return (
     <Card>
       <CardHeader>
@@ -70,10 +83,10 @@ function JourneyCard({ journey }: { journey: Journey }) {
 
       <CardFooter>
         <div className="flex justify-end w-full items-end px-10 gap-5">
-          <Button color="primary">
+          <Button color="primary" onClick={() => tracker?.trackUseIdeaClicked(journey.id)}>
             Use for an Idea
           </Button>
-          <Button>
+          <Button onClick={() => tracker?.trackCommentJourney(journey.id)}>
             Comment <CommentIcon fill="#000" width={30} height={30} size={30} />
           </Button>
 
@@ -206,6 +219,7 @@ export default function Journeys() {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const { ideaRepo } = useIdeaContext();
   const { auth } = useAuthContext();
+  const { tracker } = useTrackingContext();
 
   const router = useRouter();
   const [journeys, setJourneys] = useState<Journey[]>([]);
@@ -216,10 +230,15 @@ export default function Journeys() {
     })
   }, [journeys.length])
 
+  useEffect(() => {
+    tracker?.trackJourneyPageViewed();
+  }, [tracker])
+
   const openCreateJourneyModal = () => {
     if (!auth?.user) {
-        router.push('/auth/login')
+      router.push('/auth/login')
     }
+    tracker?.trackAddNewJourney()
     onOpen();
   }
 

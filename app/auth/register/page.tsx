@@ -4,14 +4,21 @@ import { EyeFilledIcon } from '@/components/icons/EyeFilledIcon';
 import { EyeSlashFilledIcon } from '@/components/icons/EyeSlashFilledIcon';
 import { MailIcon } from '@/components/icons/MailIcon';
 import { useAuthContext } from '@/services/auth/auth.context';
+import { useTrackingContext } from '@/services/tracking/trackering.context';
 import { Button } from '@nextui-org/button';
 import { Input, Link } from '@nextui-org/react';
 import { useRouter } from 'next/navigation';
-import { FormEvent, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 
 export default function Register() {
   const { auth } = useAuthContext();
   const router = useRouter();
+  const { tracker } = useTrackingContext();
+
+  useEffect(() => {
+    tracker?.trackRegisterPageView();
+  }, [tracker])
+
   const RegisterUser = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget)
@@ -22,6 +29,7 @@ export default function Register() {
       formData.get("full_name")?.toString() || ""
     )
     if (result && result?.length <= 0) {
+      tracker?.trackRegisterClicked();
       router.replace('/dashboard');
     }
   }

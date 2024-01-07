@@ -18,12 +18,19 @@ export class MixpanelTracker implements IProductTracking {
     }
 
     mixpanel.init(process.env.NEXT_PUBLIC_MIXPANEL_ID || "", {
-      debug: ((process.env.NEXT_PUBLIC_MIXPANEL_ID || "dev") === "dev")
-    })
+      debug: ((process.env.NEXT_PUBLIC_MIXPANEL_ID || "dev") === "dev"),
+      track_pageview: true,
+      persistence: "localStorage"
+    });
+    mixpanel.identify()
   }
 
   private trackObject(event: string, data: object = {}) {
     mixpanel.track(event, data)
+  }
+
+  identifyAsLoggedInUser(userId: string) {
+    mixpanel.identify(userId);
   }
 
 

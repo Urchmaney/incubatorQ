@@ -22,7 +22,7 @@ export default function DashboardLayout({
       return
     }
     router.push('/auth/login')
-  }, [])
+  }, [auth?.user])
   return (
     <div>
       {children}
