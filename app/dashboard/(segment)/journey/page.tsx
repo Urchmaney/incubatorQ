@@ -98,7 +98,7 @@ function JourneyCard({ journey }: { journey: Journey }) {
   )
 }
 
-function CreateJourney() {
+function CreateJourney({ closeFn }: { closeFn: () => void }) {
   const { ideaRepo } = useIdeaContext();
   const { auth } = useAuthContext();
   const [goals, setGoals] = useState([""])
@@ -146,7 +146,8 @@ function CreateJourney() {
           { name: "Product Market Fit", description: "" }],
       }
     )
-
+    
+    closeFn();
   }
 
   return (
@@ -198,7 +199,7 @@ function CreateJourney() {
                               className="max-w-full"
                               name="goal"
                               labelPlacement="outside"
-                              label={`Goal ${i + 1}`}
+                              label={`Description ${i + 1}`}
                               onValueChange={(val) => changeText(val, i)}
                               value={x}
                             />
@@ -250,7 +251,7 @@ function CreateJourney() {
 }
 
 export default function Journeys() {
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
   const { ideaRepo } = useIdeaContext();
   const { auth } = useAuthContext();
   const { tracker } = useTrackingContext();
@@ -276,6 +277,11 @@ export default function Journeys() {
     onOpen();
   }
 
+  const closeCreateJourney = () => {
+    onClose();
+    setJourneys([]);
+  }
+
 
   return (
     <div>
@@ -289,7 +295,7 @@ export default function Journeys() {
         >
           <ModalContent>
             {(onClose) => (
-              <CreateJourney />
+              <CreateJourney closeFn={closeCreateJourney} />
               // <form onSubmit={() => { }}>
               //   <>
               //     <ModalHeader className="flex flex-col gap-1">New Learning</ModalHeader>
