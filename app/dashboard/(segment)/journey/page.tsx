@@ -178,9 +178,9 @@ function CreateJourney() {
                 <CardBody>
                   <div className="flex flex-col gap-5">
                     {goals.map((x, i) => (
-                      <Card>
+                      <Card key={`set-goal-${i + 1}`}>
                         <CardBody>
-                          <div key={`set-goal-${i + 1}`} className="flex flex-col gap-5">
+                          <div className="flex flex-col gap-5">
                             <div>
                               <Input
                                 type="text"
