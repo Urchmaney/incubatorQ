@@ -18,7 +18,7 @@ export class MixpanelTracker implements IProductTracking {
     }
 
     mixpanel.init(process.env.NEXT_PUBLIC_MIXPANEL_ID || "", {
-      debug: ((process.env.NEXT_PUBLIC_MIXPANEL_ID || "dev") === "dev"),
+      debug: ((process.env.NEXT_PUBLIC_PROD || "dev") === "dev"),
       track_pageview: true,
       persistence: "localStorage"
     });
