@@ -29,7 +29,7 @@ export default function Login() {
     )
 
     if (errors && errors?.length <= 0) {
-      tracker?.identifyAsLoggedInUser(auth?.user?.userId!);
+      tracker?.identifyAsLoggedInUser(auth?.user?.email!);
       tracker?.trackLoginClicked();
       router.push('/dashboard');
     }

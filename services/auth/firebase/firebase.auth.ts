@@ -15,7 +15,8 @@ export class FirebaseAuth implements IAuth {
     if (this.firebase_user) {
       return { 
         displayName: this.firebase_user?.displayName || "",
-        userId: this.firebase_user.uid      
+        userId: this.firebase_user.uid,
+        email: this.firebase_user.email || ""
       }
     }
     return null

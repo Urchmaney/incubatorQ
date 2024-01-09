@@ -24,11 +24,12 @@ export default function Register() {
     const formData = new FormData(event.currentTarget)
     // const form_values = Object.fromEntries(formData);
     const result = await auth?.register(
-      formData.get("email")?.toString() || "", 
-      formData.get("password")?.toString() || "", 
+      formData.get("email")?.toString() || "",
+      formData.get("password")?.toString() || "",
       formData.get("full_name")?.toString() || ""
     )
     if (result && result?.length <= 0) {
+      tracker?.identifyAsLoggedInUser(auth?.user?.email!);
       tracker?.trackRegisterClicked();
       router.replace('/dashboard');
     }
