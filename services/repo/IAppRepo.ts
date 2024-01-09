@@ -16,7 +16,12 @@ export type Journey = {
   id: string
   userId: string
   pmfDescription: string
-  steps: string[]
+  steps: Step[]
+}
+
+export type Step = {
+    name: string,
+    description: string
 }
 
 export type Idea = {

@@ -46,7 +46,7 @@ export default function Register() {
               label="Full Name"
               placeholder="Kingsley"
               labelPlacement="outside"
-              color='primary'
+              color='default'
               name='full_name'
               id='full_name'
             // startContent={
@@ -62,7 +62,7 @@ export default function Register() {
               label="Email"
               placeholder="you@example.com"
               labelPlacement="outside"
-              color='primary'
+              color='default'
               name='email'
               id='email'
               startContent={
@@ -78,7 +78,7 @@ export default function Register() {
               label="Password"
               placeholder="Enter your password"
               labelPlacement="outside"
-              color='primary'
+              color='default'
               name='password'
               id='password'
             />
@@ -94,6 +94,7 @@ export default function Register() {
                 className='text-sm'
                 size='sm'
                 underline='always'
+                color='foreground'
                 href="/auth/login">Already a user? Sign in</Link>
             </div>
             <Button

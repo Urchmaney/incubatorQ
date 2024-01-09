@@ -46,7 +46,7 @@ export default function Login() {
               label="Email"
               placeholder="you@example.com"
               labelPlacement="outside"
-              color='primary'
+              color='default'
               name='email'
               id='email'
               startContent={
@@ -62,7 +62,7 @@ export default function Login() {
               label="Password"
               placeholder="Enter your password"
               labelPlacement="outside"
-              color='primary'
+              color='default'
               name='password'
               id='password'
             />
@@ -78,6 +78,7 @@ export default function Login() {
                 className='text-sm'
                 size='sm'
                 underline='always'
+                color='foreground'
                 href="/auth/register">Not a member? Register</Link>
             </div>
             <Button

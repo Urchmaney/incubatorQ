@@ -6,16 +6,16 @@ import { ChevronDown } from "@/components/icons/ChevronIcon";
 import { ChevronSideIcon } from "@/components/icons/ChevronSideIcon";
 import { CommentIcon } from "@/components/icons/CommentIcon";
 import { useAuthContext } from "@/services/auth/auth.context";
-import { Journey } from "@/services/repo/IAppRepo";
+import { Journey, Step } from "@/services/repo/IAppRepo";
 import { useIdeaContext } from "@/services/repo/idea.context";
 import { useTrackingContext } from "@/services/tracking/trackering.context";
-import { Button, Card, CardBody, CardFooter, CardHeader, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Textarea, useDisclosure } from "@nextui-org/react";
+import { Button, Card, CardBody, CardFooter, CardHeader, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Textarea, useDisclosure } from "@nextui-org/react";
 import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
 
 function StepCard({
-  expanded = false, indicator = true, styles = "", text = "", left = "", indicatorLength = ""
-}: { expanded: boolean, indicator: boolean, styles: string, text: string, left: string, indicatorLength: string }) {
+  expanded = false, indicator = true, styles = "", step, left = "", indicatorLength = ""
+}: { expanded: boolean, indicator: boolean, styles: string, step: Step, left: string, indicatorLength: string }) {
 
   const [xpanded, setXpanded] = useState(expanded)
   return (
@@ -24,13 +24,15 @@ function StepCard({
         <CardBody>
           <div className="flex gap-3">
             <div className="pt-1">
-              {xpanded && <ChevronDownIcon fill={"#000"} size={15} /> }
-              { !xpanded && <ChevronSideIcon fill={"#000"} size={15} /> }
+              {xpanded && <ChevronDownIcon fill={"#000"} size={15} />}
+              {!xpanded && <ChevronSideIcon fill={"#000"} size={15} />}
             </div>
 
-            <p className={`${xpanded ? 'min-h-unit-24' : ''}`}>{text}</p>
+            <p>{step.name}</p>
           </div>
-
+          {xpanded && <div className="p-3">
+            {step.description}
+          </div>}
         </CardBody>
       </Card>
       {indicator && <div className={`absolute h-10 border-dotted border-l-2 border-b-2 left-12`} style={{ width: indicatorLength }}></div>}
@@ -62,7 +64,7 @@ function JourneyCard({ journey }: { journey: Journey }) {
               const v = `calc((${i}*(100% - 675px))/${journey.steps.length})`
               const iLength = `calc(675px / ${journey.steps.length})`
               return (
-                <StepCard key={`journey-step-${i}`} expanded={false} indicator={i < journey.steps.length - 1} styles={`relative`} text={x} left={v} indicatorLength={iLength} />
+                <StepCard key={`journey-step-${i}`} expanded={false} indicator={i < journey.steps.length - 1} styles={`relative`} step={x} left={v} indicatorLength={iLength} />
               )
             })
           }
@@ -96,10 +98,11 @@ function JourneyCard({ journey }: { journey: Journey }) {
   )
 }
 
-function CreateJourney() {
+function CreateJourney({ closeFn }: { closeFn: () => void }) {
   const { ideaRepo } = useIdeaContext();
   const { auth } = useAuthContext();
   const [goals, setGoals] = useState([""])
+  const [stageNames, setStageNames] = useState([''])
   const changeText = (value: string, index: number) => {
     goals[index] = value
     const newGoals = [...goals]
@@ -117,21 +120,36 @@ function CreateJourney() {
     setGoals(newGoals)
   }
 
+  const changeStageNameText = (value: string, index: number) => {
+    stageNames[index] = value;
+    const newStageNames = [...stageNames];
+    setStageNames(newStageNames);
+  }
+
 
   const addJourney = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     const formData = new FormData(event.currentTarget);
     goals.pop();
+    const steps: Step[] = goals.map((x, i) => ({
+      name: stageNames[i],
+      description: x
+    }))
     ideaRepo?.createUserJourney(
       auth?.user?.userId || "",
       {
         pmfDescription: formData.get('pmf')?.toString() || "",
-        steps: ["Idea", ...goals, "Product Market Fit"],
+        steps: [
+          { name: "Idea", description: "" },
+          ...steps,
+          { name: "Product Market Fit", description: "" }],
       }
     )
-
+    
+    closeFn();
   }
+
   return (
     <div>
       <form onSubmit={addJourney}>
@@ -161,17 +179,34 @@ function CreateJourney() {
                 <CardBody>
                   <div className="flex flex-col gap-5">
                     {goals.map((x, i) => (
-                      <div key={`set-goal-${i + 1}`}>
-                        <Textarea
+                      <Card key={`set-goal-${i + 1}`}>
+                        <CardBody>
+                          <div className="flex flex-col gap-5">
+                            <div>
+                              <Input
+                                type="text"
+                                label="Stage Name"
+                                placeholder="Stage Name"
+                                labelPlacement="outside"
+                                color='default'
+                                name='stage_name'
+                                id='stage_name'
+                                onValueChange={(val) => changeStageNameText(val, i)}
+                              />
+                            </div>
+                            <Textarea
 
-                          className="max-w-full"
-                          name="goal"
-                          labelPlacement="outside"
-                          label={`Goal ${i + 1}`}
-                          onValueChange={(val) => changeText(val, i)}
-                          value={x}
-                        />
-                      </div>
+                              className="max-w-full"
+                              name="goal"
+                              labelPlacement="outside"
+                              label={`Description ${i + 1}`}
+                              onValueChange={(val) => changeText(val, i)}
+                              value={x}
+                            />
+                          </div>
+                        </CardBody>
+                      </Card>
+
                     ))}
 
 
@@ -216,7 +251,7 @@ function CreateJourney() {
 }
 
 export default function Journeys() {
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
   const { ideaRepo } = useIdeaContext();
   const { auth } = useAuthContext();
   const { tracker } = useTrackingContext();
@@ -242,6 +277,11 @@ export default function Journeys() {
     onOpen();
   }
 
+  const closeCreateJourney = () => {
+    onClose();
+    setJourneys([]);
+  }
+
 
   return (
     <div>
@@ -255,7 +295,7 @@ export default function Journeys() {
         >
           <ModalContent>
             {(onClose) => (
-              <CreateJourney />
+              <CreateJourney closeFn={closeCreateJourney} />
               // <form onSubmit={() => { }}>
               //   <>
               //     <ModalHeader className="flex flex-col gap-1">New Learning</ModalHeader>

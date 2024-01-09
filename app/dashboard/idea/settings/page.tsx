@@ -3,21 +3,21 @@
 import { AddIcon } from "@/components/icons/AddIcon";
 import { CommentIcon } from "@/components/icons/CommentIcon";
 import { useAuthContext } from "@/services/auth/auth.context";
-import { Journey } from "@/services/repo/IAppRepo";
+import { Journey, Step } from "@/services/repo/IAppRepo";
 import { useIdeaContext } from "@/services/repo/idea.context";
 import { Button, Card, CardBody, CardFooter, CardHeader, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Textarea, useDisclosure } from "@nextui-org/react";
 import { FormEvent, useEffect, useState } from "react";
 
 function StepCard({
-  expanded = false, indicator = true, styles = "", text = "", left = "", indicatorLength = ""
-}: { expanded: boolean, indicator: boolean, styles: string, text: string, left: string, indicatorLength: string }) {
+  expanded = false, indicator = true, styles = "", step, left = "", indicatorLength = ""
+}: { expanded: boolean, indicator: boolean, styles: string, step: Step, left: string, indicatorLength: string }) {
 
   const [xpanded, setXpanded] = useState(expanded)
   return (
     <div className={`relative cursor-pointer max-w-2xl pb-4 ${styles}`} style={{ left: left }} onClick={() => setXpanded(!xpanded)}>
       <Card>
         <CardBody>
-          <p className={`${xpanded ? 'h-24' : ''}`}>{text}</p>
+          <p className={`${xpanded ? 'h-24' : ''}`}>{step.name}</p>
         </CardBody>
       </Card>
       {indicator && <div className={`absolute h-10 border-dotted border-l-2 border-b-2 left-12`} style={{ width: indicatorLength }}></div>}
@@ -48,7 +48,7 @@ function JourneyCard({ journey }: { journey: Journey }) {
               const v = `calc((${i}*(100% - 675px))/${journey.steps.length})`
               const iLength = `calc(675px / ${journey.steps.length})`
               return (
-                <StepCard key={`journey-step-${i}`} expanded={false} indicator={i < journey.steps.length - 1} styles={`relative`} text={x} left={v} indicatorLength={iLength} />
+                <StepCard key={`journey-step-${i}`} expanded={false} indicator={i < journey.steps.length - 1} styles={`relative`} step={x} left={v} indicatorLength={iLength} />
               )
             })
           }
@@ -85,7 +85,7 @@ function JourneyCard({ journey }: { journey: Journey }) {
 function CreateJourney() {
   const { ideaRepo } = useIdeaContext();
   const { auth } = useAuthContext();
-  const [goals, setGoals] = useState([""])
+  const [goals, setGoals] = useState([""]);
   const changeText = (value: string, index: number) => {
     goals[index] = value
     const newGoals = [...goals]
@@ -109,11 +109,15 @@ function CreateJourney() {
 
     const formData = new FormData(event.currentTarget);
     goals.pop();
+    // const steps: Step[] = goals.map((x, i) => ({
+    //     name: stageNames[i],
+    //     description: x
+    //   }))
     ideaRepo?.createUserJourney(
       auth?.user?.userId || "",
       {
         pmfDescription: formData.get('pmf')?.toString() || "",
-        steps: ["Idea", ...goals, "Product Market Fit"],
+        steps: [],
       }
     )
 
