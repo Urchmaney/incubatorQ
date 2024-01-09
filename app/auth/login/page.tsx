@@ -5,13 +5,19 @@ import { EyeSlashFilledIcon } from '@/components/icons/EyeSlashFilledIcon';
 import { MailIcon } from '@/components/icons/MailIcon';
 import { Button } from '@nextui-org/button';
 import { Input, Link } from '@nextui-org/react';
-import { FormEvent, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation'
 import { useAuthContext } from '@/services/auth/auth.context';
+import { useTrackingContext } from '@/services/tracking/trackering.context';
 
 export default function Login() {
   const router = useRouter();
   const { auth } = useAuthContext();
+  const { tracker } = useTrackingContext();
+
+  useEffect(() => {
+    tracker?.trackLoginPageView();
+  }, [tracker])
 
   const loginUser = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -23,6 +29,8 @@ export default function Login() {
     )
 
     if (errors && errors?.length <= 0) {
+      tracker?.identifyAsLoggedInUser(auth?.user?.email!);
+      tracker?.trackLoginClicked();
       router.push('/dashboard');
     }
   }
@@ -38,7 +46,7 @@ export default function Login() {
               label="Email"
               placeholder="you@example.com"
               labelPlacement="outside"
-              color='primary'
+              color='default'
               name='email'
               id='email'
               startContent={
@@ -54,7 +62,7 @@ export default function Login() {
               label="Password"
               placeholder="Enter your password"
               labelPlacement="outside"
-              color='primary'
+              color='default'
               name='password'
               id='password'
             />
@@ -70,6 +78,7 @@ export default function Login() {
                 className='text-sm'
                 size='sm'
                 underline='always'
+                color='foreground'
                 href="/auth/register">Not a member? Register</Link>
             </div>
             <Button

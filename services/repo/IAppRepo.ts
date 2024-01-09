@@ -9,13 +9,19 @@ export default interface IAppRepo {
   getIdeaAssumptions(ideaId: string): Promise<Assumption[]>
 
   createUserJourney(userId: string, journey: Partial<Journey>): Promise<Partial<{ journeyId: string, error: string }>>
+  getJourneys(): Promise<Journey[]>
 }
 
 export type Journey = {
   id: string
   userId: string
   pmfDescription: string
-  steps: string[]
+  steps: Step[]
+}
+
+export type Step = {
+    name: string,
+    description: string
 }
 
 export type Idea = {

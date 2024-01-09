@@ -1,8 +1,9 @@
 "use client"
 
 import { useAuthContext } from "@/services/auth/auth.context";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { ReactNode, useEffect } from "react"
+import { useRouter as useRouterRouter } from "next/router";
 
 export default function DashboardLayout({
   children,
@@ -10,12 +11,18 @@ export default function DashboardLayout({
   children: ReactNode
 }) {
   const router = useRouter()
+//   const routerRouter = useRouterRouter();
+  const path = usePathname();
   const { auth } = useAuthContext();
+
+  
+  
   useEffect(() => {
-    if(!auth?.user) {
-      router.push('/auth/login')
+    if(path === "/dashboard/journey" || auth?.user) {
+      return
     }
-  }, [])
+    router.push('/auth/login')
+  }, [auth?.user])
   return (
     <div>
       {children}

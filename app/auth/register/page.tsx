@@ -4,24 +4,33 @@ import { EyeFilledIcon } from '@/components/icons/EyeFilledIcon';
 import { EyeSlashFilledIcon } from '@/components/icons/EyeSlashFilledIcon';
 import { MailIcon } from '@/components/icons/MailIcon';
 import { useAuthContext } from '@/services/auth/auth.context';
+import { useTrackingContext } from '@/services/tracking/trackering.context';
 import { Button } from '@nextui-org/button';
 import { Input, Link } from '@nextui-org/react';
 import { useRouter } from 'next/navigation';
-import { FormEvent, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 
 export default function Register() {
   const { auth } = useAuthContext();
   const router = useRouter();
+  const { tracker } = useTrackingContext();
+
+  useEffect(() => {
+    tracker?.trackRegisterPageView();
+  }, [tracker])
+
   const RegisterUser = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget)
     // const form_values = Object.fromEntries(formData);
     const result = await auth?.register(
-      formData.get("email")?.toString() || "", 
-      formData.get("password")?.toString() || "", 
+      formData.get("email")?.toString() || "",
+      formData.get("password")?.toString() || "",
       formData.get("full_name")?.toString() || ""
     )
     if (result && result?.length <= 0) {
+      tracker?.identifyAsLoggedInUser(auth?.user?.email!);
+      tracker?.trackRegisterClicked();
       router.replace('/dashboard');
     }
   }
@@ -38,7 +47,7 @@ export default function Register() {
               label="Full Name"
               placeholder="Kingsley"
               labelPlacement="outside"
-              color='primary'
+              color='default'
               name='full_name'
               id='full_name'
             // startContent={
@@ -54,7 +63,7 @@ export default function Register() {
               label="Email"
               placeholder="you@example.com"
               labelPlacement="outside"
-              color='primary'
+              color='default'
               name='email'
               id='email'
               startContent={
@@ -70,7 +79,7 @@ export default function Register() {
               label="Password"
               placeholder="Enter your password"
               labelPlacement="outside"
-              color='primary'
+              color='default'
               name='password'
               id='password'
             />
@@ -86,6 +95,7 @@ export default function Register() {
                 className='text-sm'
                 size='sm'
                 underline='always'
+                color='foreground'
                 href="/auth/login">Already a user? Sign in</Link>
             </div>
             <Button

@@ -16,7 +16,8 @@ export default function AuthLayout({
     if (auth?.user) {
       router.push('/dashboard');
     }
-  }, [])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [auth?.user])
   return (
     <div className="w-full h-screen flex justify-center items-center">
       <div>
