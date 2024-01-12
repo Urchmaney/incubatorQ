@@ -2,7 +2,7 @@
 import { ChevronDown } from "@/components/icons/ChevronIcon";
 import { useAuthContext } from "@/services/auth/auth.context";
 import { Navbar, NavbarBrand, User, NavbarContent, Dropdown, NavbarItem, DropdownTrigger, Link, Button, DropdownMenu, DropdownItem } from "@nextui-org/react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { ReactNode } from "react";
 
 export default function DashboardSegmentLayout({
@@ -13,6 +13,9 @@ export default function DashboardSegmentLayout({
 
   const { auth } = useAuthContext();
   const router = useRouter();
+  const path = usePathname();
+
+  const currentPath = path.split("/")[2]
 
   const logOut = () => {
     auth?.logout();
@@ -52,12 +55,16 @@ export default function DashboardSegmentLayout({
             </NavbarItem>
           </NavbarContent> */}
           <NavbarContent justify="center">
-            <NavbarItem>
-              <Link href="/dashboard/journey" color="foreground" isBlock>Journey</Link>
+            <NavbarItem isActive={currentPath === 'journey' }>
+              <Link href="/dashboard/journey" color="foreground" isBlock aria-current="page">Journey</Link>
             </NavbarItem>
 
-            <NavbarItem>
+            <NavbarItem isActive={currentPath === undefined}>
               <Link href="/dashboard" color="foreground"  isBlock>Ideas</Link>
+            </NavbarItem>
+
+            <NavbarItem isActive={ currentPath === 'team'}>
+              <Link href="/dashboard" color="foreground"  isBlock>Team</Link>
             </NavbarItem>
             {/* <Dropdown>
               <NavbarItem>
