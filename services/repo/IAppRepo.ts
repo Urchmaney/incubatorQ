@@ -9,6 +9,7 @@ export default interface IAppRepo {
   getIdeaAssumptions(ideaId: string): Promise<Assumption[]>
 
   createUserJourney(userId: string, journey: Partial<Journey>): Promise<Partial<{ journeyId: string, error: string }>>
+  updateUserJourney(userId: string, journeyId: string, journey: Partial<Journey>): Promise<Partial<{ journeyId: string, error: string }>>
   getJourneys(): Promise<Journey[]>
 }
 
