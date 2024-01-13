@@ -1,4 +1,4 @@
-import { Firestore, QueryDocumentSnapshot, addDoc, collection, doc, getDoc, getDocs, getFirestore, query, setDoc, where } from "firebase/firestore";
+import { Firestore, QueryDocumentSnapshot, addDoc, collection, doc, getDoc, getDocs, getFirestore, query, setDoc, where, updateDoc } from "firebase/firestore";
 import IAppRepo, { Assumption, Idea, Journey, Learning } from "../IAppRepo";
 import firebase_app from "@/firebase.config";
 
@@ -32,7 +32,18 @@ export class FirebaseIdeaRepo implements IAppRepo {
   constructor() {
     this.appFirestore = getFirestore(firebase_app)
   }
-  
+
+  async updateUserJourney(userId: string, journeyId: string, journey: Partial<Journey>): Promise<Partial<{ journeyId: string; error: string; }>> {
+    try {
+      updateDoc(doc(this.appFirestore, this.JOURNEY_COLLECTION, journeyId), journey)
+      return { journeyId: journeyId }
+    }
+    catch (err) {
+      return { error: "Error " }
+    }
+
+  }
+
   async getJourneys(): Promise<Journey[]> {
     try {
       const collectionRef = collection(this.appFirestore, this.JOURNEY_COLLECTION).withConverter(this.FIREBASE_JOURNEY_CONVERTER);
