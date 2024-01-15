@@ -25,11 +25,16 @@ export type Step = {
     description: string
 }
 
+export type IdeaStep = Step & {
+    status: "done" | "ongoing" | "initial"
+}
+
 export type Idea = {
   id: string
   name: string
   description: string
   problem: string
+  steps?: IdeaStep[]
 }
 
 export type Learning = {
