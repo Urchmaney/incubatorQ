@@ -39,7 +39,11 @@ export default function Dashboard() {
   const createIdea = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
-    const result = await ideaRepo?.createUserIdea(auth?.user?.userId || "", formData.get("ideaname")?.toString() || "")
+    const result = await ideaRepo?.createUserIdea(
+        auth?.user?.userId || "",
+        formData.get("ideaname")?.toString() || "",
+        auth?.user?.email || ""
+        )
     if (result?.idea) {
       setActiveIdea?.(result.idea);
       tracker?.trackCreateNewIdeaClicked();

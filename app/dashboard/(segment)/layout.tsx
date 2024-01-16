@@ -63,8 +63,8 @@ export default function DashboardSegmentLayout({
               <Link href="/dashboard" color="foreground"  isBlock>Ideas</Link>
             </NavbarItem>
 
-            <NavbarItem isActive={ currentPath === 'team'}>
-              <Link href="/dashboard" color="foreground"  isBlock>Team</Link>
+            <NavbarItem isActive={ currentPath === 'teams'}>
+              <Link href="/dashboard/teams" color="foreground"  isBlock>Team</Link>
             </NavbarItem>
             {/* <Dropdown>
               <NavbarItem>

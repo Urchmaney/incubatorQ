@@ -128,10 +128,14 @@ export class FirebaseIdeaRepo implements IAppRepo {
     return querySnapshot.docs.map(v => ({ id: v.id, ...v.data() }))
   }
 
-  async createUserIdea(userId: string, idea: string): Promise<{ error?: string[], idea?: Idea }> {
+  async createUserIdea(userId: string, idea: string, email: string): Promise<{ error?: string[], idea?: Idea }> {
     const data = {
       name: idea,
-      userId: userId
+      userId: userId,
+      membersIds: [userId],
+      members: [
+        { id: userId, owner: true, email }
+      ]
     };
     try {
       const collectionRef = collection(this.appFirestore, this.IDEA_COLLECTION).withConverter(this.FIREBASE_IDEA_CONVERTER)
@@ -142,7 +146,9 @@ export class FirebaseIdeaRepo implements IAppRepo {
           id: result.id,
           name: doc?.name || "",
           description: doc?.description || "",
-          problem: doc?.problem || ""
+          problem: doc?.problem || "",
+          members: doc?.members || [],
+          membersIds: doc?.membersIds || []
         }
       };
     }
