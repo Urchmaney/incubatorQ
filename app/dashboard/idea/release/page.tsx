@@ -1,11 +1,56 @@
 "use client"
+import { CheckIcon } from "@/components/icons/CheckIcon";
+import { EyeFilledIcon } from "@/components/icons/EyeFilledIcon";
+import { InfoIcon } from "@/components/icons/InfoIcon";
 import { useAuthContext } from "@/services/auth/auth.context";
-import { Button, Checkbox, CheckboxGroup, Input, Textarea } from "@nextui-org/react";
+import { useIdeaContext } from "@/services/repo/idea.context";
+import { BreadcrumbItem, Breadcrumbs, Button, Checkbox, CheckboxGroup, Input, Textarea } from "@nextui-org/react";
+import { useState } from "react";
 
 export default function Release() {
-  const {auth} = useAuthContext();
+  const { auth } = useAuthContext();
+  const { activeIdea } = useIdeaContext();
+
+  const [currentStep, setCurrentStep] = useState<number>(0)
+
   return (
     <div className="p-6">
+      {
+        (activeIdea?.steps || []).length > 0 && (
+          <div>
+            <Breadcrumbs underline="active" onAction={(key) => setCurrentStep(parseInt(key.toString()))}>
+              {
+                activeIdea?.steps?.map((step, i) => (
+                  <BreadcrumbItem key={i} isCurrent={currentStep === i }>
+                    <p className="flex items-center gap-3">
+                      {step.name} 
+                      { step.status === "initial" && <EyeFilledIcon className="" /> }
+                      { step.status === "done" && <CheckIcon size={15} /> }
+                      { step.status === "ongoing" && <InfoIcon size={15}  /> }
+                    </p>
+                  </BreadcrumbItem>
+                ))
+              }
+
+              {/* <BreadcrumbItem key="music" isCurrent={currentPage === "music"}>
+                Musicrfvfvrefrefrefrefe
+              </BreadcrumbItem>
+              <BreadcrumbItem key="artist" isCurrent={currentPage === "artist"}>
+                Artist
+              </BreadcrumbItem>
+              <BreadcrumbItem key="album" isCurrent={currentPage === "album"}>
+                Album
+              </BreadcrumbItem>
+              <BreadcrumbItem key="song" isCurrent={currentPage === "song"}>
+                Song
+              </BreadcrumbItem> */}
+            </Breadcrumbs>
+          </div>
+        )
+
+      }
+
+
       <div className="flex justify-end">
         <Button>Start</Button>
       </div>
@@ -17,8 +62,7 @@ export default function Release() {
             isDisabled
             label="Goal"
             labelPlacement="outside"
-            value="Lorem ipsum is a placeholder text commonly used in publishing and graphic design to demonstrate the visual form of a document or a typeface without relying on meaningful content1234. It is essentially nonsense text that still gives an idea of what real words will look like in the final product3. The phrase lorem ipsum derives from the Latin phrase dolorem ipsum, which translates to pain itself."
-            className="max-w-full"
+            value={activeIdea?.steps?.[currentStep]?.description || ""}
           />
 
         </div>
@@ -57,7 +101,7 @@ export default function Release() {
 
         </div>
       </div>
-    </div>
+    </div >
   )
 
 }
