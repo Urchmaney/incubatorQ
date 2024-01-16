@@ -42,7 +42,8 @@ export default function Dashboard() {
     const result = await ideaRepo?.createUserIdea(
         auth?.user?.userId || "",
         formData.get("ideaname")?.toString() || "",
-        auth?.user?.email || ""
+        auth?.user?.email || "",
+        auth?.user?.displayName || ""
         )
     if (result?.idea) {
       setActiveIdea?.(result.idea);

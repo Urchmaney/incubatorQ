@@ -1,7 +1,7 @@
 "use client"
 import { ChevronDown } from "@/components/icons/ChevronIcon";
 import { useAuthContext } from "@/services/auth/auth.context";
-import { Navbar, NavbarBrand, User, NavbarContent, Dropdown, NavbarItem, DropdownTrigger, Link, Button, DropdownMenu, DropdownItem } from "@nextui-org/react";
+import { Navbar, NavbarBrand, User, NavbarContent, Dropdown, NavbarItem, DropdownTrigger, Link, Button, DropdownMenu, DropdownItem, Badge, Avatar, DropdownSection } from "@nextui-org/react";
 import { useRouter, usePathname } from "next/navigation";
 import { ReactNode } from "react";
 
@@ -28,13 +28,61 @@ export default function DashboardSegmentLayout({
         <Navbar>
           <NavbarBrand>
             {/* <AcmeLogo /> */}
-            <User
+
+            {/* <User
               name={auth?.user?.displayName}
 
               avatarProps={{
                 src: "https://img.freepik.com/premium-vector/user-profile-icon-flat-style-member-avatar-vector-illustration-isolated-background-human-permission-sign-business-concept_157943-15752.jpg?w=740"
               }}
-            />
+            /> */}
+            {auth?.user && <Dropdown placement="bottom-end">
+              <DropdownTrigger>
+                <div className="flex items-center cursor-pointer">
+                  <Badge content="5" color="primary">
+                    <Avatar src="https://img.freepik.com/premium-vector/user-profile-icon-flat-style-member-avatar-vector-illustration-isolated-background-human-permission-sign-business-concept_157943-15752.jpg?w=740" />
+                    {/* <User
+                name={auth?.user?.displayName}
+
+                avatarProps={{
+                  src: "https://img.freepik.com/premium-vector/user-profile-icon-flat-style-member-avatar-vector-illustration-isolated-background-human-permission-sign-business-concept_157943-15752.jpg?w=740"
+                }}
+              /> */}
+                  </Badge>
+                  <p className="text-sm">{auth?.user?.displayName}</p>
+                </div>
+
+              </DropdownTrigger>
+              <DropdownMenu aria-label="Profile Actions" variant="flat">
+                <DropdownSection>
+                  <DropdownItem key="profile" className="h-20 gap-2">
+                    <div className="flex flex-col gap-3 p-2 pt-5">
+                      <p className="font-normal">Invitation to Join <span className="font-bold">Pinzera</span></p>
+                      <div className="flex gap-5">
+                        <Button color="primary">Accept</Button>
+                        <Button>Reject</Button>
+                      </div>
+                    </div>
+
+                  </DropdownItem>
+                </DropdownSection>
+
+                <DropdownSection>
+                  <DropdownItem key="profile" className="h-20 gap-5">
+                    <div className="flex flex-col gap-3 p-2 pt-5">
+                      <p className="font-normal">Invitation to Join <span className="font-bold">Pinzera</span></p>
+                      <div className="flex gap-5">
+                        <Button color="primary">Accept</Button>
+                        <Button>Reject</Button>
+                      </div>
+                    </div>
+
+                  </DropdownItem>
+                </DropdownSection>
+
+              </DropdownMenu>
+            </Dropdown>
+            }
 
           </NavbarBrand>
           {/* <NavbarContent className="hidden sm:flex gap-4" justify="center">
@@ -55,16 +103,16 @@ export default function DashboardSegmentLayout({
             </NavbarItem>
           </NavbarContent> */}
           <NavbarContent justify="center">
-            <NavbarItem isActive={currentPath === 'journey' }>
+            <NavbarItem isActive={currentPath === 'journey'}>
               <Link href="/dashboard/journey" color="foreground" isBlock aria-current="page">Journey</Link>
             </NavbarItem>
 
             <NavbarItem isActive={currentPath === undefined}>
-              <Link href="/dashboard" color="foreground"  isBlock>Ideas</Link>
+              <Link href="/dashboard" color="foreground" isBlock>Ideas</Link>
             </NavbarItem>
 
-            <NavbarItem isActive={ currentPath === 'teams'}>
-              <Link href="/dashboard/teams" color="foreground"  isBlock>Team</Link>
+            <NavbarItem isActive={currentPath === 'teams'}>
+              <Link href="/dashboard/teams" color="foreground" isBlock>Team</Link>
             </NavbarItem>
             {/* <Dropdown>
               <NavbarItem>

@@ -128,13 +128,13 @@ export class FirebaseIdeaRepo implements IAppRepo {
     return querySnapshot.docs.map(v => ({ id: v.id, ...v.data() }))
   }
 
-  async createUserIdea(userId: string, idea: string, email: string): Promise<{ error?: string[], idea?: Idea }> {
+  async createUserIdea(userId: string, idea: string, email: string, name: string): Promise<{ error?: string[], idea?: Idea }> {
     const data = {
       name: idea,
       userId: userId,
       membersIds: [userId],
       members: [
-        { id: userId, owner: true, email }
+        { id: userId, owner: true, email, name }
       ]
     };
     try {
