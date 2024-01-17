@@ -1,5 +1,5 @@
-import { Firestore, QueryDocumentSnapshot, addDoc, collection, doc, getDoc, getDocs, getFirestore, query, setDoc, where, updateDoc } from "firebase/firestore";
-import IAppRepo, { Assumption, Idea, Journey, Learning } from "../IAppRepo";
+import { Firestore, QueryDocumentSnapshot, addDoc, collection, doc, getDoc, getDocs, getFirestore, query, setDoc, where, updateDoc, deleteDoc, arrayUnion } from "firebase/firestore";
+import IAppRepo, { Assumption, Idea, Invitation, Journey, Learning, Member } from "../IAppRepo";
 import firebase_app from "@/firebase.config";
 
 
@@ -7,6 +7,7 @@ export class FirebaseIdeaRepo implements IAppRepo {
   private appFirestore: Firestore
   readonly IDEA_COLLECTION: string = "ideas"
   readonly JOURNEY_COLLECTION: string = "journeys"
+  readonly INVITATION_COLLECTION: string = "invitations"
 
   readonly FIREBASE_IDEA_CONVERTER = {
     fromFirestore: (snap: QueryDocumentSnapshot) => snap.data() as Idea,
@@ -28,9 +29,60 @@ export class FirebaseIdeaRepo implements IAppRepo {
     toFirestore: (data: Partial<Journey>) => data
   }
 
+  readonly FIREBASE_INVITATION_CONVERTER = {
+    fromFirestore: (snap: QueryDocumentSnapshot) => snap.data() as Invitation,
+    toFirestore: (data: Partial<Invitation>) => data
+  }
+
 
   constructor() {
     this.appFirestore = getFirestore(firebase_app)
+  }
+
+  async getUserInvitations(email: string): Promise<Invitation[]> {
+    const collectionRef = collection(this.appFirestore, this.INVITATION_COLLECTION).withConverter(this.FIREBASE_INVITATION_CONVERTER);
+    const queryRef = query(collectionRef, where("email", "==", email));
+    const querySnapshot = await getDocs(queryRef);
+    return querySnapshot.docs.map(v => ({ id: v.id, ...v.data() } as Invitation))
+  }
+
+
+  async createInvitation(email: string, idea: string, ideaId: string, userId: string): Promise<Partial<{ success: boolean; error: string; }>> {
+    try {
+      const data = { email, idea, ideaId, userId }
+      const collectionRef = collection(this.appFirestore, this.INVITATION_COLLECTION).withConverter(this.FIREBASE_INVITATION_CONVERTER)
+      await addDoc(collectionRef, data);
+      return { success: true }
+    }
+    catch(e) {
+      return { error: "Error creating Invitation." }
+    }
+  }
+
+
+  async acceptInvitation(invitation: Invitation, user: { userId: string, email: string, username: string }): Promise<void> {
+    try {
+      if (invitation.email.toLowerCase() !== user.email.toLowerCase()) return;
+
+      await updateDoc(doc(this.appFirestore, this.IDEA_COLLECTION, invitation.ideaId), {
+        membersId: arrayUnion(user.userId),
+        members: arrayUnion({ id: user.userId, owner: false, email: user.email, name: user.username })
+      })
+
+      await this.cancelInvitation(invitation, user)
+    } catch (e) {
+      return
+    }
+  }
+
+
+  async cancelInvitation(invitation: Invitation, userEmail: { userId: string, email: string, username: string }): Promise<void> {
+    try {
+      await deleteDoc(doc(this.appFirestore, this.INVITATION_COLLECTION, invitation.id))
+    }
+    catch(e){
+      return
+    }
   }
 
   async updateUserJourney(userId: string, journeyId: string, journey: Partial<Journey>): Promise<Partial<{ journeyId: string; error: string; }>> {
@@ -113,7 +165,7 @@ export class FirebaseIdeaRepo implements IAppRepo {
 
   }
 
-  async updateIdeaProperties(ideaId: string, properties: Partial<{ description: string, problem: string }>): Promise<void> {
+  async updateIdeaProperties(ideaId: string, properties: Partial<{ description: string, problem: string,  members: Member[], membersId: string[] }>): Promise<void> {
     try {
       setDoc(doc(this.appFirestore, this.IDEA_COLLECTION, ideaId), properties, { merge: true })
     } catch (error) {
