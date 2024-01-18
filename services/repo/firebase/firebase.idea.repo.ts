@@ -1,4 +1,4 @@
-import { Firestore, QueryDocumentSnapshot, addDoc, collection, doc, getDoc, getDocs, getFirestore, query, setDoc, where, updateDoc, deleteDoc, arrayUnion } from "firebase/firestore";
+import { Firestore, QueryDocumentSnapshot, addDoc, collection, doc, getDoc, getDocs, getFirestore, query, setDoc, where, updateDoc, deleteDoc, arrayUnion, or } from "firebase/firestore";
 import IAppRepo, { Assumption, Idea, Invitation, Journey, Learning, Member } from "../IAppRepo";
 import firebase_app from "@/firebase.config";
 
@@ -64,8 +64,9 @@ export class FirebaseIdeaRepo implements IAppRepo {
     try {
       if (invitation.email.toLowerCase() !== user.email.toLowerCase()) return;
 
+
       await updateDoc(doc(this.appFirestore, this.IDEA_COLLECTION, invitation.ideaId), {
-        membersId: arrayUnion(user.userId),
+        membersIds: arrayUnion(user.userId),
         members: arrayUnion({ id: user.userId, owner: false, email: user.email, name: user.username })
       })
 
@@ -174,6 +175,13 @@ export class FirebaseIdeaRepo implements IAppRepo {
   }
 
   async getUserIdeas(userId: string): Promise<Partial<Idea>[]> {
+    const collectionRef = collection(this.appFirestore, this.IDEA_COLLECTION).withConverter(this.FIREBASE_IDEA_CONVERTER);
+    const queryRef = query(collectionRef, or(where("userId", "==", userId), where("membersIds", "array-contains", userId)));
+    const querySnapshot = await getDocs(queryRef);
+    return querySnapshot.docs.map(v => ({ id: v.id, ...v.data() }))
+  }
+
+  async getUserOwnedIdeas(userId: string): Promise<Partial<Idea>[]> {
     const collectionRef = collection(this.appFirestore, this.IDEA_COLLECTION).withConverter(this.FIREBASE_IDEA_CONVERTER);
     const queryRef = query(collectionRef, where("userId", "==", userId));
     const querySnapshot = await getDocs(queryRef);

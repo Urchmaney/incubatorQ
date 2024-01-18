@@ -17,7 +17,7 @@ export default function DashboardSegmentLayout({
   const { ideaRepo } = useIdeaContext();
   const router = useRouter();
   const path = usePathname();
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
 
   const [invitations, setInvitations] = useState<Invitation[]>([]);
   const [selectedInvite, setSelectedInvite] = useState<Invitation | null>(null);
@@ -31,7 +31,7 @@ export default function DashboardSegmentLayout({
       console.log(e)
     })
 
-  }, [invitations.length, auth?.user])
+  }, [invitations.length])
 
   const currentPath = path.split("/")[2]
 
@@ -43,6 +43,24 @@ export default function DashboardSegmentLayout({
   const selectInvitation = (key: Key) => {
     setSelectedInvite(invitations.find(v => v?.id === key.toString() ) || null);
     onOpen();
+  }
+
+  const acceptInvitation = () => {
+    ideaRepo?.acceptInvitation(selectedInvite!, {
+      userId: auth?.user?.userId || "",
+      username: auth?.user?.displayName || "",
+      email: auth?.user?.email || ""
+    })
+    onClose();
+  }
+
+  const cancelInvitation = () => {
+    ideaRepo?.cancelInvitation(selectedInvite!, {
+      userId: auth?.user?.userId || "",
+      username: auth?.user?.displayName || "",
+      email: auth?.user?.email || ""
+    });
+    onClose();
   }
 
   return (
@@ -220,10 +238,10 @@ export default function DashboardSegmentLayout({
                 </p>
               </ModalBody>
               <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
+                <Button color="danger" variant="light" onPress={cancelInvitation}>
                   Cancel
                 </Button>
-                <Button color="primary" onPress={onClose}>
+                <Button color="primary" onPress={acceptInvitation}>
                   Accept
                 </Button>
               </ModalFooter>
