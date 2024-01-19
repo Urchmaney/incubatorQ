@@ -3,7 +3,7 @@
 import { useAuthContext } from "@/services/auth/auth.context";
 import { Idea } from "@/services/repo/IAppRepo";
 import { useIdeaContext } from "@/services/repo/idea.context";
-import { Button, Card, CardBody, CardHeader, Input } from "@nextui-org/react";
+import { Badge, Button, Card, CardBody, CardHeader, Input } from "@nextui-org/react";
 import { useState, useEffect, FormEvent } from "react";
 
 export default function Teams() {
@@ -26,7 +26,25 @@ export default function Teams() {
       formData.get("teamemail")?.toString()!,
       userIdeas[index].name!,
       userIdeas[index].id!,
-      auth?.user?.userId! 
+      auth?.user?.userId!
+    ).then(x => {
+      setUserIdeas([]);
+    })
+  }
+
+  const removeUserFromIdea = (ideaIndex: number, memberIndex: number) => {
+    ideaRepo?.removeMemberFromIdea(
+      userIdeas[ideaIndex].id || "", 
+      (userIdeas[ideaIndex]?.members || [])[memberIndex]
+    ).then(x => {
+      setUserIdeas([]);
+    })
+  }
+
+  const removePendingUserFromIdea = (ideaIndex: number, pIndex: number) => {
+    ideaRepo?.removePendingMemberFromIdea(
+      userIdeas[ideaIndex].id || "", 
+      (userIdeas[ideaIndex]?.pendingMembers || [])[pIndex]
     ).then(x => {
       setUserIdeas([]);
     })
@@ -80,7 +98,22 @@ export default function Teams() {
                               </p>
                             </div>
 
-                            <Button size="sm">Remove</Button>
+                            <Button size="sm" onClick={() => removeUserFromIdea(index, i)}>Remove</Button>
+                          </div>
+                        ))
+                      }
+
+                      {
+                        idea.pendingMembers?.map((member, ipending) => (
+                          <div className="flex justify-between" key={`ownedIdes-${index}-pendmember${ipending}`}>
+                            <div>
+                              <p>  </p>
+                              <p className="text-sm text-neutral-500">
+                                {member.email.slice(0, 15)} {member.email.length > 15 ? '...' : ''} &nbsp;<span className="rounded-md bg-default-100 px-2 py-1">pending</span>
+                              </p>
+                            </div>
+
+                            <Button size="sm" onClick={() => removePendingUserFromIdea(index, ipending)}>Remove</Button>
                           </div>
                         ))
                       }

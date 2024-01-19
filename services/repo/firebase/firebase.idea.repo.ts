@@ -1,5 +1,5 @@
-import { Firestore, QueryDocumentSnapshot, addDoc, collection, doc, getDoc, getDocs, getFirestore, query, setDoc, where, updateDoc, deleteDoc, arrayUnion, or } from "firebase/firestore";
-import IAppRepo, { Assumption, Idea, Invitation, Journey, Learning, Member } from "../IAppRepo";
+import { Firestore, QueryDocumentSnapshot, addDoc, collection, doc, getDoc, getDocs, getFirestore, query, setDoc, where, updateDoc, deleteDoc, arrayUnion, or, arrayRemove } from "firebase/firestore";
+import IAppRepo, { Assumption, Idea, Invitation, Journey, Learning, Member, PendingMember } from "../IAppRepo";
 import firebase_app from "@/firebase.config";
 
 
@@ -39,6 +39,30 @@ export class FirebaseIdeaRepo implements IAppRepo {
     this.appFirestore = getFirestore(firebase_app)
   }
 
+  async removePendingMemberFromIdea(ideaId: string, member: PendingMember): Promise<void> {
+    try {
+      await updateDoc(doc(this.appFirestore, this.IDEA_COLLECTION, ideaId), {
+        pendingMembers: arrayRemove(member)
+      });
+      await deleteDoc(doc(this.appFirestore, this.INVITATION_COLLECTION, member.inviteId ))
+    } catch(e) {
+      console.log("error removing pending")
+      return
+    }
+  }
+
+
+  async removeMemberFromIdea(ideaId: string, member: Member): Promise<void> {
+    try {
+      await updateDoc(doc(this.appFirestore, this.IDEA_COLLECTION, ideaId), {
+        members: arrayRemove(member),
+        membersIds: arrayRemove(member.id)
+      })
+    } catch(e) {
+      return
+    }
+  }
+
   async getUserInvitations(email: string): Promise<Invitation[]> {
     const collectionRef = collection(this.appFirestore, this.INVITATION_COLLECTION).withConverter(this.FIREBASE_INVITATION_CONVERTER);
     const queryRef = query(collectionRef, where("email", "==", email));
@@ -51,7 +75,10 @@ export class FirebaseIdeaRepo implements IAppRepo {
     try {
       const data = { email, idea, ideaId, userId }
       const collectionRef = collection(this.appFirestore, this.INVITATION_COLLECTION).withConverter(this.FIREBASE_INVITATION_CONVERTER)
-      await addDoc(collectionRef, data);
+      const result = await addDoc(collectionRef, data);
+      await updateDoc(doc(this.appFirestore, this.IDEA_COLLECTION, ideaId), {
+        pendingMembers: arrayUnion({ inviteId: result.id,  email })
+      })
       return { success: true }
     }
     catch(e) {
@@ -67,7 +94,8 @@ export class FirebaseIdeaRepo implements IAppRepo {
 
       await updateDoc(doc(this.appFirestore, this.IDEA_COLLECTION, invitation.ideaId), {
         membersIds: arrayUnion(user.userId),
-        members: arrayUnion({ id: user.userId, owner: false, email: user.email, name: user.username })
+        members: arrayUnion({ id: user.userId, owner: false, email: user.email, name: user.username }),
+        pendingMembers: arrayRemove({ inviteId: invitation.id, email: invitation.email })
       })
 
       await this.cancelInvitation(invitation, user)
@@ -77,9 +105,12 @@ export class FirebaseIdeaRepo implements IAppRepo {
   }
 
 
-  async cancelInvitation(invitation: Invitation, userEmail: { userId: string, email: string, username: string }): Promise<void> {
+  async cancelInvitation(invitation: Invitation, user: { userId: string, email: string, username: string }): Promise<void> {
     try {
       await deleteDoc(doc(this.appFirestore, this.INVITATION_COLLECTION, invitation.id))
+      await updateDoc(doc(this.appFirestore, this.IDEA_COLLECTION, invitation.ideaId), {
+        pendingMembers: arrayRemove(user.email)
+      })
     }
     catch(e){
       return
@@ -208,7 +239,8 @@ export class FirebaseIdeaRepo implements IAppRepo {
           description: doc?.description || "",
           problem: doc?.problem || "",
           members: doc?.members || [],
-          membersIds: doc?.membersIds || []
+          membersIds: doc?.membersIds || [],
+          pendingMembers: doc?.pendingMembers || []
         }
       };
     }

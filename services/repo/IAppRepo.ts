@@ -17,6 +17,9 @@ export default interface IAppRepo {
   getUserInvitations(email: string): Promise<Invitation[]>
   acceptInvitation(invitationId: Invitation, user: { userId: string, email: string, username: string }): Promise<void>
   cancelInvitation(invitationId: Invitation, user: { userId: string, email: string, username: string }): Promise<void>
+
+  removeMemberFromIdea(ideaId: string, member: Member): Promise<void>
+  removePendingMemberFromIdea(ideaId: string, member: PendingMember): Promise<void>
 }
 
 export type Journey = {
@@ -43,6 +46,7 @@ export type Idea = {
   steps?: IdeaStep[]
   membersIds: string[]
   members: Member[]
+  pendingMembers: PendingMember[]
 }
 
 export type Member = {
@@ -50,6 +54,11 @@ export type Member = {
     owner: boolean
     email: string
     name: string
+}
+
+export type PendingMember = {
+    email: string,
+    inviteId: string
 }
 
 export type Learning = {

@@ -50,7 +50,7 @@ export default function DashboardSegmentLayout({
       userId: auth?.user?.userId || "",
       username: auth?.user?.displayName || "",
       email: auth?.user?.email || ""
-    })
+    }).then(() => setInvitations([]));
     onClose();
   }
 
@@ -59,7 +59,7 @@ export default function DashboardSegmentLayout({
       userId: auth?.user?.userId || "",
       username: auth?.user?.displayName || "",
       email: auth?.user?.email || ""
-    });
+    }).then(() => setInvitations([]));
     onClose();
   }
 
