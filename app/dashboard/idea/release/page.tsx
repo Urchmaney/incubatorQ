@@ -9,7 +9,7 @@ import { Idea } from "@/services/repo/IAppRepo";
 import { useIdeaContext } from "@/services/repo/idea.context";
 import { BreadcrumbItem, Breadcrumbs, Button, Checkbox, CheckboxGroup, Input, Modal, ModalBody, ModalContent, ModalFooter, Textarea, useDisclosure } from "@nextui-org/react";
 import { useState } from "react";
-import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+
 
 export default function Release() {
   const { auth } = useAuthContext();
@@ -34,23 +34,6 @@ export default function Release() {
     }
   })();
 
-
-  const onDragEnd = (result: any) => {
-    // dropped outside the list
-    if (!result.destination) {
-      return;
-    }
-
-    // const items = reorder(
-    //   this.state.items,
-    //   result.source.index,
-    //   result.destination.index
-    // );
-
-    // this.setState({
-    //   items
-    // });
-  }
 
 
   return (
@@ -159,89 +142,7 @@ export default function Release() {
                 </p> */}
 
 
-                <DragDropContext onDragEnd={onDragEnd}>
-                  <Droppable droppableId="droppable">
-                    {(provided: any, snapshot: any) => (
-                      <div
-                        {...provided.droppableProps}
-                        ref={provided.innerRef}
-
-                      >
-
-                        <Draggable draggableId={"0"} index={0}>
-                          {(provided: any, snapshot: any) => (
-
-                            <div className="flex items-center"
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                            >
-                              <div className="cursor-pointer">
-                                <DragIndicatorIcon fill="#000" size={24} />
-                              </div>
-                              <Input
-                                type="text"
-                                placeholder="you@example.com"
-                                color='default'
-                                name='step1'
-                                id='step1'
-
-                              />
-                            </div>
-                          )}
-                        </Draggable>
-
-                        <Draggable draggableId={"0"} index={0}>
-                          {(provided: any, snapshot: any) => (
-
-                            <div className="flex items-center"
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                            >
-                              <div className="cursor-pointer">
-                                <DragIndicatorIcon fill="#000" size={24} />
-                              </div>
-                              <Input
-                                type="text"
-                                placeholder="you@example.com"
-                                color='default'
-                                name='step1'
-                                id='step1'
-
-                              />
-                            </div>
-                          )}
-                        </Draggable>
-
-                        <Draggable draggableId={"0"} index={0}>
-                          {(provided: any, snapshot: any) => (
-
-                            <div className="flex items-center"
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                            >
-                              <div className="cursor-pointer">
-                                <DragIndicatorIcon fill="#000" size={24} />
-                              </div>
-                              <Input
-                                type="text"
-                                placeholder="you@example.com"
-                                color='default'
-                                name='step1'
-                                id='step1'
-
-                              />
-                            </div>
-                          )}
-                        </Draggable>
-
-                      </div>
-                    )}
-                  </Droppable>
-
-                </DragDropContext>
+        
                 <div className="gap-2 flex flex-col">
 
                   {/* <div
