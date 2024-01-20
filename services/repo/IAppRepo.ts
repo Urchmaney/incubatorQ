@@ -2,7 +2,7 @@ export default interface IAppRepo {
   createUserIdea(userId: string, idea: string, email: string, name: string): Promise<{ error?: string[], idea?: Idea }>
   getUserIdeas(userId: string) : Promise<Partial<Idea>[]>
   getUserOwnedIdeas(userId: string) : Promise<Partial<Idea>[]>
-  updateIdeaProperties(ideaId: string, properties: Partial<{ description: string, problem: string, members: Member[], membersId: string[] }>) : Promise<void>
+  updateIdeaProperties(ideaId: string, properties: Partial<{ description: string, problem: string, steps: IdeaStep[] }>) : Promise<void>
   addIdeaLearning(ideaId: string, learning: string): Promise<void>
   getIdeaLearnings(ideaId: string): Promise<Learning[]>
 
@@ -35,7 +35,9 @@ export type Step = {
 }
 
 export type IdeaStep = Step & {
-    status: "done" | "ongoing" | "initial"
+    status: "done" | "ongoing" | "initial",
+    howValidate: string,
+    measuring: string
 }
 
 export type Idea = {

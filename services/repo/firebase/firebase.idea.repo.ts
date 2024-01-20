@@ -1,5 +1,5 @@
 import { Firestore, QueryDocumentSnapshot, addDoc, collection, doc, getDoc, getDocs, getFirestore, query, setDoc, where, updateDoc, deleteDoc, arrayUnion, or, arrayRemove } from "firebase/firestore";
-import IAppRepo, { Assumption, Idea, Invitation, Journey, Learning, Member, PendingMember } from "../IAppRepo";
+import IAppRepo, { Assumption, Idea, IdeaStep, Invitation, Journey, Learning, Member, PendingMember } from "../IAppRepo";
 import firebase_app from "@/firebase.config";
 
 
@@ -197,7 +197,7 @@ export class FirebaseIdeaRepo implements IAppRepo {
 
   }
 
-  async updateIdeaProperties(ideaId: string, properties: Partial<{ description: string, problem: string,  members: Member[], membersId: string[] }>): Promise<void> {
+  async updateIdeaProperties(ideaId: string, properties: Partial<{ description: string, problem: string, steps: IdeaStep[] }>): Promise<void> {
     try {
       setDoc(doc(this.appFirestore, this.IDEA_COLLECTION, ideaId), properties, { merge: true })
     } catch (error) {
