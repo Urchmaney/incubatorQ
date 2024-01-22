@@ -9,13 +9,13 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@dnd-kit/core": "^6.1.0",
     "@nextui-org/react": "^2.2.9",
     "firebase": "^10.7.1",
     "framer-motion": "^10.16.16",
     "mixpanel-browser": "^2.48.1",
     "next": "14.0.4",
     "react": "^18",
-    "react-beautiful-dnd": "^13.1.1",
     "react-dom": "^18"
   },
   "devDependencies": {

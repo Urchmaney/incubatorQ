@@ -6,15 +6,71 @@ import { EyeFilledIcon } from "@/components/icons/EyeFilledIcon";
 import { InfoIcon } from "@/components/icons/InfoIcon";
 import { useAuthContext } from "@/services/auth/auth.context";
 import { Idea } from "@/services/repo/IAppRepo";
-import { useIdeaContext } from "@/services/repo/idea.context";
+import { IdeaContextProvider, useIdeaContext } from "@/services/repo/idea.context";
+import { DndContext, DragEndEvent, useDraggable, useDroppable } from "@dnd-kit/core";
 import { BreadcrumbItem, Breadcrumbs, Button, Checkbox, CheckboxGroup, Input, Modal, ModalBody, ModalContent, ModalFooter, Textarea, useDisclosure } from "@nextui-org/react";
-import { useState } from "react";
+import { ReactNode, useState } from "react";
+
+function DraggableInput({ id, index }: { id: string, index: number }) {
+  const { attributes, listeners, setNodeRef, transform, setActivatorNodeRef } = useDraggable({
+    id: `draggable-${index}`,
+    data: {
+      index
+    }
+  });
+
+
+  const style = transform ? {
+    transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+  } : undefined;
+
+
+  return (
+    <div className="flex items-center" ref={setNodeRef} >
+      <div className="cursor-pointer" ref={setActivatorNodeRef} style={style} {...listeners} {...attributes}>
+        <DragIndicatorIcon size={24} />
+      </div>
+      <div style={style} className="flex-1">
+        <Input
+          type="text"
+          placeholder="you@example.com"
+          color='default'
+          name='step1'
+          id='step1'
+          defaultValue={id}
+          {...attributes}
+        />
+      </div>
+
+    </div>
+  )
+}
+
+
+function DroppableSection({ id, children, index }: { id: string, children: ReactNode, index: number }) {
+  const { isOver, setNodeRef: dropSecRef } = useDroppable({ id: id, data: { index, sci: `plan-${index}`} });
+
+
+  const style = {
+    color: isOver ? 'green' : undefined,
+  };
+
+  return (
+    <div ref={dropSecRef} style={style}>
+      {children}
+    </div>
+  )
+}
 
 
 export default function Release() {
   const { auth } = useAuthContext();
   const { activeIdea, setActiveIdea, ideaRepo } = useIdeaContext();
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
+
+
+
+
 
   const [currentStep, setCurrentStep] = useState<number>(0);
 
@@ -34,7 +90,36 @@ export default function Release() {
     }
   })();
 
+  const onDragEnd = (result: DragEndEvent) => {
+    // dropped outside the list
+    if (!result.over) {
+      return;
+    }
 
+    const oldIndex = Number(result.active.id.toString().split("-")[1])
+    const newIndex = Number(result.over.id.toString().split("-")[1])
+
+    const newItems = reorder(
+      items,
+      oldIndex,
+      newIndex
+    );
+
+    setItems(newItems)
+  }
+
+
+  const [items, setItems] = useState(["Luke", "Cage", "Monac", "plag", "Junss", "Planck", "Gmae", "Pandndnd"])
+
+  //const [items, setItems] = useState(["Luke", "Mark"])
+
+  const reorder = (list: string[], startIndex: number, endIndex: number) => {
+    const result = Array.from(list);
+    const [removed] = result.splice(startIndex, 1);
+    result.splice(endIndex, 0, removed);
+
+    return result;
+  };
 
   return (
     <div className="p-6">
@@ -142,51 +227,23 @@ export default function Release() {
                 </p> */}
 
 
-        
-                <div className="gap-2 flex flex-col">
-
-                  {/* <div
-                    ref={provided.innerRef}
-                    {...provided.draggableProps}
-                    {...provided.dragHandleProps}
-                    style={getItemStyle(
-                      snapshot.isDragging,
-                      provided.draggableProps.style
-                    )}
-                  >
-                    {item.content}
-                  </div> */}
+                <DndContext onDragEnd={onDragEnd}>
 
 
+                  
+                    <div className="gap-5 flex flex-col">
+                      {
 
-                  <div className="flex items-center">
-                    <div className="cursor-pointer">
-                      <DragIndicatorIcon fill="#000" size={24} />
+                        items.map((item, index) => (
+                          <DroppableSection id={`drop-${index}`}  key={`dragg-${item}`} index={index}>
+                             <DraggableInput id={item} index={index} />
+                          </DroppableSection>
+                        ))
+                      }
                     </div>
-                    <Input
-                      type="text"
-                      placeholder="you@example.com"
-                      color='default'
-                      name='step1'
-                      id='step1'
 
-                    />
-                  </div>
-
-                  <div className="flex items-center">
-                    <div className="cursor-pointer">
-                      <DragIndicatorIcon fill="#000" size={24} />
-                    </div>
-                    <Input
-                      type="text"
-                      placeholder="you@example.com"
-                      color='default'
-                      name='step1'
-                      id='step1'
-
-                    />
-                  </div>
-                </div>
+                </DndContext>
+              
               </ModalBody>
               {/* <ModalFooter>
                 <Button color="danger" variant="light" onPress={onClose}>
