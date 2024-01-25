@@ -87,7 +87,7 @@ export default function Dashboard() {
         </div> */}
 
         <div className="flex justify-center items-center w-[30%] bg-gray-200 h-[290px] rounded-md text-2xl cursor-pointer" onClick={ openNewIdeaModal }>
-          <AddIcon className="" />
+          <AddIcon classname="" />
 
           <Modal
             isOpen={isOpen}

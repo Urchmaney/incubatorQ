@@ -1,24 +1,26 @@
 "use client"
+import { AddIcon } from "@/components/icons/AddIcon";
 import { AnchorIcon } from "@/components/icons/AnchorIcon";
 import { CheckIcon } from "@/components/icons/CheckIcon";
 import { DragIndicatorIcon } from "@/components/icons/DragIndicatorIcon";
+import { EditIcon } from "@/components/icons/EditIcon";
 import { EyeFilledIcon } from "@/components/icons/EyeFilledIcon";
 import { InfoIcon } from "@/components/icons/InfoIcon";
+import { TrashIcon } from "@/components/icons/TrashIcon";
 import { useAuthContext } from "@/services/auth/auth.context";
 import { Idea } from "@/services/repo/IAppRepo";
 import { IdeaContextProvider, useIdeaContext } from "@/services/repo/idea.context";
 import { DndContext, DragEndEvent, useDraggable, useDroppable } from "@dnd-kit/core";
-import { BreadcrumbItem, Breadcrumbs, Button, Checkbox, CheckboxGroup, Input, Modal, ModalBody, ModalContent, ModalFooter, Textarea, useDisclosure } from "@nextui-org/react";
-import { ReactNode, useState } from "react";
+import { BreadcrumbItem, Breadcrumbs, Button, Checkbox, CheckboxGroup, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Textarea, useDisclosure } from "@nextui-org/react";
+import { ReactNode, useCallback, useState } from "react";
 
-function DraggableInput({ id, index }: { id: string, index: number }) {
+function DraggableInput({ id, index, onValueChange, value }: { id: string, index: number, onValueChange: (val: string) => void, value: string }) {
   const { attributes, listeners, setNodeRef, transform, setActivatorNodeRef } = useDraggable({
     id: `draggable-${index}`,
     data: {
       index
     }
   });
-
 
   const style = transform ? {
     transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
@@ -35,20 +37,21 @@ function DraggableInput({ id, index }: { id: string, index: number }) {
           type="text"
           placeholder="you@example.com"
           color='default'
-          name='step1'
-          id='step1'
-          defaultValue={id}
+          name={id}
+          id={id}
+          onValueChange={onValueChange}
+          defaultValue={value}
           {...attributes}
+          endContent={<button className="focus:outline-none" type="button"><TrashIcon /></button>}
         />
       </div>
-
     </div>
   )
 }
 
 
 function DroppableSection({ id, children, index }: { id: string, children: ReactNode, index: number }) {
-  const { isOver, setNodeRef: dropSecRef } = useDroppable({ id: id, data: { index, sci: `plan-${index}`} });
+  const { isOver, setNodeRef: dropSecRef } = useDroppable({ id: id, data: { index, sci: `plan-${index}` } });
 
 
   const style = {
@@ -81,14 +84,37 @@ export default function Release() {
       nSteps[currentStep][key as "description" | "howValidate" | "measuring"] = value
 
       clearTimeout(timeoutId)
+      setActiveIdea?.({ ...activeIdea, steps: nSteps } as Idea)
       timeoutId = setTimeout(() => {
-        ideaRepo?.updateIdeaProperties(activeIdea?.id || "", { steps: nSteps })
+        // ideaRepo?.updateIdeaProperties(activeIdea?.id || "", { steps: nSteps })
         setActiveIdea?.({ ...activeIdea, steps: nSteps } as Idea)
         // setActiveIdea?.({...activeIdea, problem } as Idea)
         console.log("updating   ", key, value)
       }, 4000)
     }
   })();
+
+  const updateIdeaStepsCb = useCallback(updateIdeaSteps, [currentStep])
+
+
+  const updateStepsNames = (index: number, valName: string) => {
+    const nStep = [...(activeIdea?.steps || [])];
+    nStep[index].name = valName;
+    setActiveIdea?.({ ...activeIdea, steps: nStep } as Idea)
+  }
+
+  const addNewStep = () => {
+    const nStep = [...(activeIdea?.steps || [])];
+    nStep.unshift({ name: "Untitled", description: "", measuring: "", howValidate: "", status: "initial"});
+    //nStep.push({ name: "Untitled", description: "", measuring: "", howValidate: "", status: "initial"});
+    setActiveIdea?.({ ...activeIdea, steps: nStep } as Idea)
+
+  }
+
+  const onCloseModal = () => {
+    ideaRepo?.updateIdeaProperties(activeIdea?.id || "", { steps: activeIdea?.steps })
+    onClose();
+  }
 
   const onDragEnd = (result: DragEndEvent) => {
     // dropped outside the list
@@ -99,17 +125,17 @@ export default function Release() {
     const oldIndex = Number(result.active.id.toString().split("-")[1])
     const newIndex = Number(result.over.id.toString().split("-")[1])
 
-    const newItems = reorder(
-      items,
-      oldIndex,
-      newIndex
-    );
+    // const newItems = reorder(
+    //   items,
+    //   oldIndex,
+    //   newIndex
+    // );
 
-    setItems(newItems)
+    // setItems(newItems)
   }
 
 
-  const [items, setItems] = useState(["Luke", "Cage", "Monac", "plag", "Junss", "Planck", "Gmae", "Pandndnd"])
+  // const [items, setItems] = useState(["Luke", "Cage", "Monac", "plag", "Junss", "Planck", "Gmae", "Pandndnd"])
 
   //const [items, setItems] = useState(["Luke", "Mark"])
 
@@ -121,12 +147,16 @@ export default function Release() {
     return result;
   };
 
+
+  const numberOfSteps = activeIdea?.steps?.length || 0;
+
+  console.log(currentStep)
   return (
     <div className="p-6">
       {
         (activeIdea?.steps || []).length > 0 && (
           <div className="flex justify-between items-center py-5">
-            <Breadcrumbs underline="active" onAction={(key) => setCurrentStep(parseInt(key.toString()))}>
+            <Breadcrumbs underline="active" onAction={(key) => { setCurrentStep(parseInt(key.toString())) }}>
               {
                 activeIdea?.steps?.map((step, i) => (
                   <BreadcrumbItem key={i} isCurrent={currentStep === i}>
@@ -153,7 +183,7 @@ export default function Release() {
                 Song
               </BreadcrumbItem> */}
             </Breadcrumbs>
-            <div className="cursor-pointer" onClick={onOpen}> <AnchorIcon size={15} /> </div>
+            <div className="cursor-pointer" onClick={onOpen}> <EditIcon classnames="" /> </div>
           </div>
         )
 
@@ -171,7 +201,8 @@ export default function Release() {
             label="Goal"
             labelPlacement="outside"
             defaultValue={activeIdea?.steps?.[currentStep]?.description || ""}
-            onValueChange={(val) => updateIdeaSteps("description", val)}
+            onValueChange={(val) => updateIdeaStepsCb("description", val)}
+            value={activeIdea?.steps?.[currentStep]?.description || ""}
           />
 
         </div>
@@ -217,34 +248,48 @@ export default function Release() {
         isOpen={isOpen}
         placement="top"
         onOpenChange={onOpenChange}
+        onClose={onCloseModal}
       >
         <ModalContent>
           {(onClose) => (
             <>
+              <ModalHeader>
+
+              </ModalHeader>
               <ModalBody>
                 {/* <p className="py-5">
                   Invitation to join the idea:  <span  className="font-bold">Mine</span>
                 </p> */}
+                <div className="flex gap-6 flex-col">
+                  <div className="flex justify-end">
+                    <Button onClick={addNewStep} variant="light"><AddIcon classname="" size={24} /></Button>
+                  </div>
 
 
-                <DndContext onDragEnd={onDragEnd}>
-
-
-                  
+                  <DndContext onDragEnd={onDragEnd}>
                     <div className="gap-5 flex flex-col">
                       {
 
-                        items.map((item, index) => (
-                          <DroppableSection id={`drop-${index}`}  key={`dragg-${item}`} index={index}>
-                             <DraggableInput id={item} index={index} />
+                        activeIdea?.steps?.map((step, index) => (
+                          <DroppableSection id={`drop-${numberOfSteps - index}`} key={`drop-${numberOfSteps - index}`} index={numberOfSteps - index}>
+
+                            <DraggableInput id={`drag-${numberOfSteps - index}`} index={numberOfSteps - index} onValueChange={(val) => { updateStepsNames(index, val) }} value={step.name} />
+
+
                           </DroppableSection>
                         ))
                       }
                     </div>
 
-                </DndContext>
-              
+                  </DndContext>
+                </div>
+
+
+
               </ModalBody>
+              <ModalFooter>
+
+              </ModalFooter>
               {/* <ModalFooter>
                 <Button color="danger" variant="light" onPress={onClose}>
                   Cancel

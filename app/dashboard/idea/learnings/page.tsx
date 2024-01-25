@@ -28,7 +28,7 @@ export default function Learnings() {
       <div>
         <div className="flex flex-col gap-10">
           <div className="flex justify-end items-center">
-            <Button variant="light" isIconOnly onClick={onOpen}> <AddIcon className="h-6 w-6" /></Button>
+            <Button variant="light" isIconOnly onClick={onOpen}> <AddIcon classname="h-6 w-6" /></Button>
             <Modal
               isOpen={isOpen}
               placement="top"
