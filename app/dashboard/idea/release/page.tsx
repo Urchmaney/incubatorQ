@@ -8,13 +8,15 @@ import { EyeFilledIcon } from "@/components/icons/EyeFilledIcon";
 import { InfoIcon } from "@/components/icons/InfoIcon";
 import { TrashIcon } from "@/components/icons/TrashIcon";
 import { useAuthContext } from "@/services/auth/auth.context";
-import { Idea } from "@/services/repo/IAppRepo";
+import { Idea, IdeaStep } from "@/services/repo/IAppRepo";
 import { IdeaContextProvider, useIdeaContext } from "@/services/repo/idea.context";
 import { DndContext, DragEndEvent, useDraggable, useDroppable } from "@dnd-kit/core";
 import { BreadcrumbItem, Breadcrumbs, Button, Checkbox, CheckboxGroup, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Textarea, useDisclosure } from "@nextui-org/react";
 import { ReactNode, useCallback, useState } from "react";
 
-function DraggableInput({ id, index, onValueChange, value }: { id: string, index: number, onValueChange: (val: string) => void, value: string }) {
+function DraggableInput(
+  { id, index, onValueChange, value, onTrashClick }: 
+  { id: string, index: number, onValueChange: (val: string) => void, value: string, onTrashClick: () => void }) {
   const { attributes, listeners, setNodeRef, transform, setActivatorNodeRef } = useDraggable({
     id: `draggable-${index}`,
     data: {
@@ -40,9 +42,9 @@ function DraggableInput({ id, index, onValueChange, value }: { id: string, index
           name={id}
           id={id}
           onValueChange={onValueChange}
-          defaultValue={value}
+          value={value}
           {...attributes}
-          endContent={<button className="focus:outline-none" type="button"><TrashIcon /></button>}
+          endContent={<button onClick={onTrashClick} className="focus:outline-none" type="button"><TrashIcon /></button>}
         />
       </div>
     </div>
@@ -111,6 +113,13 @@ export default function Release() {
 
   }
 
+  const removeStep = (stepId: number) => {
+    const nStep = [...(activeIdea?.steps || [])];
+    nStep.splice(stepId, 1);
+    //nStep.push({ name: "Untitled", description: "", measuring: "", howValidate: "", status: "initial"});
+    setActiveIdea?.({ ...activeIdea, steps: nStep } as Idea)
+  }
+
   const onCloseModal = () => {
     ideaRepo?.updateIdeaProperties(activeIdea?.id || "", { steps: activeIdea?.steps })
     onClose();
@@ -122,24 +131,30 @@ export default function Release() {
       return;
     }
 
-    const oldIndex = Number(result.active.id.toString().split("-")[1])
-    const newIndex = Number(result.over.id.toString().split("-")[1])
+    const sizeOfSteps = activeIdea?.steps?.length || 0;
+    const oldIndex = sizeOfSteps - Number(result.active.id.toString().split("-")[1]);
+    const newIndex = sizeOfSteps - Number(result.over.id.toString().split("-")[1]);
+    
 
-    // const newItems = reorder(
-    //   items,
-    //   oldIndex,
-    //   newIndex
-    // );
+    const newSteps = reorder(
+      activeIdea?.steps || [],
+      oldIndex,
+      newIndex
+    );
 
+    setActiveIdea?.({ ...activeIdea, steps: newSteps } as Idea);
+
+    // (activeIdea?.steps|| [])[oldIndex].name = "Dragging"
     // setItems(newItems)
+
   }
 
-
+  
   // const [items, setItems] = useState(["Luke", "Cage", "Monac", "plag", "Junss", "Planck", "Gmae", "Pandndnd"])
 
   //const [items, setItems] = useState(["Luke", "Mark"])
 
-  const reorder = (list: string[], startIndex: number, endIndex: number) => {
+  const reorder = (list: IdeaStep[], startIndex: number, endIndex: number) => {
     const result = Array.from(list);
     const [removed] = result.splice(startIndex, 1);
     result.splice(endIndex, 0, removed);
@@ -273,7 +288,7 @@ export default function Release() {
                         activeIdea?.steps?.map((step, index) => (
                           <DroppableSection id={`drop-${numberOfSteps - index}`} key={`drop-${numberOfSteps - index}`} index={numberOfSteps - index}>
 
-                            <DraggableInput id={`drag-${numberOfSteps - index}`} index={numberOfSteps - index} onValueChange={(val) => { updateStepsNames(index, val) }} value={step.name} />
+                            <DraggableInput id={`drag-${numberOfSteps - index}`} index={numberOfSteps - index} onValueChange={(val) => { updateStepsNames(index, val) }} value={step.name} onTrashClick={() => removeStep(index)} />
 
 
                           </DroppableSection>
