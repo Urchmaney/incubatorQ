@@ -247,8 +247,8 @@ export default function Release() {
           <div className="flex flex-col gap-2">
             {
               (activeIdea?.steps || [])[currentStep]?.assumptions?.map(assump => (
-                <div>
-                  <Checkbox value="buenos-aires" defaultSelected color="default" key={assump.id}>{assump.content}</Checkbox>
+                <div key={assump.id}>
+                  <Checkbox value="buenos-aires" defaultSelected color="default" >{assump.content}</Checkbox>
                 </div>
               )
               )
