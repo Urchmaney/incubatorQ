@@ -135,10 +135,17 @@ export default function Release() {
 
   const addStepAssumption =  async (event: React.KeyboardEvent<HTMLDivElement>) => {
     if (!assumption.length || event.key !== 'Enter') return;
+
+    const result = await ideaRepo?.addIdeaAssumption(activeIdea?.id || "", assumption);
+    if (result?.error) return
+
+
     if (!(activeIdea?.steps!)[currentStep].assumptions) {
       (activeIdea?.steps!)[currentStep].assumptions = []
     }
-    (activeIdea?.steps!)[currentStep].assumptions.push({ id: "kinnss ", content: assumption })
+
+    (activeIdea?.steps!)[currentStep].assumptions.push({ id: result?.id || "", content: assumption })
+    ideaRepo?.updateIdeaProperties(activeIdea?.id || "", { steps: activeIdea?.steps })
     setActiveIdea?.({ ...activeIdea, steps: [...(activeIdea?.steps || [])] } as Idea)
     setAssumption("")
   }
@@ -215,6 +222,7 @@ export default function Release() {
                 Song
               </BreadcrumbItem> */}
             </Breadcrumbs>
+            {/* <Button onClick={onOpen}><EditIcon classnames="" /></Button> */}
             <div className="cursor-pointer" onClick={onOpen}> <EditIcon classnames="" /> </div>
           </div>
         )
@@ -226,7 +234,7 @@ export default function Release() {
         <Button>Start</Button>
       </div>
 
-      <div className="flex flex-col gap-8 ">
+      <div className="flex flex-col gap-12 ">
         <div>
 
           <Textarea
@@ -242,7 +250,8 @@ export default function Release() {
         <div className="flex flex-col gap-3">
           <div className="flex justify-between">
             <p className="text-[0.875rem] text-gray-500">What are we validating?</p>
-            <Button onClick={onOpenAssumModal} variant="light"><AddIcon size={20} /></Button>
+            <div className="cursor-pointer" onClick={onOpenAssumModal}> <AddIcon size={20} /> </div>
+            {/* <Button onClick={onOpenAssumModal} variant="light"><AddIcon size={20} /></Button> */}
           </div>
           <div className="flex flex-col gap-2">
             {
@@ -310,7 +319,7 @@ export default function Release() {
               </ModalHeader>
               <ModalBody>
 
-                Assumptions sign
+                Issue Loading Assumptions
               </ModalBody>
               <ModalFooter>
 

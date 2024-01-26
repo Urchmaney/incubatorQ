@@ -6,7 +6,7 @@ export default interface IAppRepo {
   addIdeaLearning(ideaId: string, learning: string): Promise<void>
   getIdeaLearnings(ideaId: string): Promise<Learning[]>
 
-  addIdeaAssumption(ideaId: string, learning: string): Promise<Partial<{ id: string, error: string }>>
+  addIdeaAssumption(ideaId: string, assumption: string): Promise<Partial<{ id: string, error: string }>>
   getIdeaAssumptions(ideaId: string): Promise<Assumption[]>
 
   createUserJourney(userId: string, journey: Partial<Journey>): Promise<Partial<{ journeyId: string, error: string }>>
