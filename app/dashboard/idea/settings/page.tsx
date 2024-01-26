@@ -221,7 +221,7 @@ export default function Settings() {
   return (
     <div>
       <div className="flex justify-end items-center px-6">
-        <Button variant="light" isIconOnly onClick={onOpen}> <AddIcon className="h-6 w-6" /></Button>
+        <Button variant="light" isIconOnly onClick={onOpen}> <AddIcon classname="h-6 w-6" /></Button>
         <Modal
           isOpen={isOpen}
           placement="top"

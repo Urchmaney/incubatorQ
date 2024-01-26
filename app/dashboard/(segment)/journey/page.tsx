@@ -344,7 +344,7 @@ export default function Journeys() {
   return (
     <div>
       <div className="flex justify-end items-center px-6">
-        <Button variant="light" isIconOnly onClick={openCreateJourneyModal}> <AddIcon className="h-6 w-6" /></Button>
+        <Button variant="light" isIconOnly onClick={openCreateJourneyModal}> <AddIcon classname="h-6 w-6" /></Button>
         <Modal
           isOpen={isOpen}
           placement="top"
