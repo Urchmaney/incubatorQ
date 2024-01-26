@@ -98,10 +98,10 @@ export default function Release() {
       clearTimeout(timeoutId)
       
       timeoutId = setTimeout(() => {
-        // ideaRepo?.updateIdeaProperties(activeIdea?.id || "", { steps: nSteps })
+        ideaRepo?.updateIdeaProperties(activeIdea?.id || "", { steps: nSteps })
         // setActiveIdea?.({ ...activeIdea, steps: nSteps } as Idea)
         // setActiveIdea?.({...activeIdea, problem } as Idea)
-        console.log("updating   ", key, value)
+        // console.log("updating   ", key, value)
       }, 4000)
     }
   })();
