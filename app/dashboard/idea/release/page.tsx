@@ -8,13 +8,15 @@ import { EyeFilledIcon } from "@/components/icons/EyeFilledIcon";
 import { InfoIcon } from "@/components/icons/InfoIcon";
 import { TrashIcon } from "@/components/icons/TrashIcon";
 import { useAuthContext } from "@/services/auth/auth.context";
-import { Idea } from "@/services/repo/IAppRepo";
+import { Idea, IdeaStep, StepAssumption } from "@/services/repo/IAppRepo";
 import { IdeaContextProvider, useIdeaContext } from "@/services/repo/idea.context";
 import { DndContext, DragEndEvent, useDraggable, useDroppable } from "@dnd-kit/core";
 import { BreadcrumbItem, Breadcrumbs, Button, Checkbox, CheckboxGroup, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Textarea, useDisclosure } from "@nextui-org/react";
 import { ReactNode, useCallback, useState } from "react";
 
-function DraggableInput({ id, index, onValueChange, value }: { id: string, index: number, onValueChange: (val: string) => void, value: string }) {
+function DraggableInput(
+  { id, index, onValueChange, value, onTrashClick }:
+    { id: string, index: number, onValueChange: (val: string) => void, value: string, onTrashClick: () => void }) {
   const { attributes, listeners, setNodeRef, transform, setActivatorNodeRef } = useDraggable({
     id: `draggable-${index}`,
     data: {
@@ -40,9 +42,9 @@ function DraggableInput({ id, index, onValueChange, value }: { id: string, index
           name={id}
           id={id}
           onValueChange={onValueChange}
-          defaultValue={value}
+          value={value}
           {...attributes}
-          endContent={<button className="focus:outline-none" type="button"><TrashIcon /></button>}
+          endContent={<button onClick={onTrashClick} className="focus:outline-none" type="button"><TrashIcon /></button>}
         />
       </div>
     </div>
@@ -71,6 +73,14 @@ export default function Release() {
   const { activeIdea, setActiveIdea, ideaRepo } = useIdeaContext();
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
 
+  const [assumption, setAssumption] = useState("");
+
+  const {
+    isOpen: isAssumOpen,
+    onOpen: onOpenAssumModal,
+    onOpenChange: onOpenAssumChange,
+    onClose: onCloseAssum
+  } = useDisclosure();
 
 
 
@@ -105,15 +115,32 @@ export default function Release() {
 
   const addNewStep = () => {
     const nStep = [...(activeIdea?.steps || [])];
-    nStep.unshift({ name: "Untitled", description: "", measuring: "", howValidate: "", status: "initial"});
+    nStep.unshift({ name: "Untitled", description: "", measuring: "", howValidate: "", status: "initial", assumptions: [] });
     //nStep.push({ name: "Untitled", description: "", measuring: "", howValidate: "", status: "initial"});
     setActiveIdea?.({ ...activeIdea, steps: nStep } as Idea)
 
   }
 
+  const removeStep = (stepId: number) => {
+    const nStep = [...(activeIdea?.steps || [])];
+    nStep.splice(stepId, 1);
+    //nStep.push({ name: "Untitled", description: "", measuring: "", howValidate: "", status: "initial"});
+    setActiveIdea?.({ ...activeIdea, steps: nStep } as Idea)
+  }
+
   const onCloseModal = () => {
     ideaRepo?.updateIdeaProperties(activeIdea?.id || "", { steps: activeIdea?.steps })
     onClose();
+  }
+
+  const addStepAssumption =  async (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (!assumption.length || event.key !== 'Enter') return;
+    if (!(activeIdea?.steps!)[currentStep].assumptions) {
+      (activeIdea?.steps!)[currentStep].assumptions = []
+    }
+    (activeIdea?.steps!)[currentStep].assumptions.push({ id: "kinnss ", content: assumption })
+    setActiveIdea?.({ ...activeIdea, steps: [...(activeIdea?.steps || [])] } as Idea)
+    setAssumption("")
   }
 
   const onDragEnd = (result: DragEndEvent) => {
@@ -122,16 +149,22 @@ export default function Release() {
       return;
     }
 
-    const oldIndex = Number(result.active.id.toString().split("-")[1])
-    const newIndex = Number(result.over.id.toString().split("-")[1])
+    const sizeOfSteps = activeIdea?.steps?.length || 0;
+    const oldIndex = sizeOfSteps - Number(result.active.id.toString().split("-")[1]);
+    const newIndex = sizeOfSteps - Number(result.over.id.toString().split("-")[1]);
 
-    // const newItems = reorder(
-    //   items,
-    //   oldIndex,
-    //   newIndex
-    // );
 
+    const newSteps = reorder(
+      activeIdea?.steps || [],
+      oldIndex,
+      newIndex
+    );
+
+    setActiveIdea?.({ ...activeIdea, steps: newSteps } as Idea);
+
+    // (activeIdea?.steps|| [])[oldIndex].name = "Dragging"
     // setItems(newItems)
+
   }
 
 
@@ -139,7 +172,7 @@ export default function Release() {
 
   //const [items, setItems] = useState(["Luke", "Mark"])
 
-  const reorder = (list: string[], startIndex: number, endIndex: number) => {
+  const reorder = (list: IdeaStep[], startIndex: number, endIndex: number) => {
     const result = Array.from(list);
     const [removed] = result.splice(startIndex, 1);
     result.splice(endIndex, 0, removed);
@@ -150,7 +183,6 @@ export default function Release() {
 
   const numberOfSteps = activeIdea?.steps?.length || 0;
 
-  console.log(currentStep)
   return (
     <div className="p-6">
       {
@@ -207,16 +239,40 @@ export default function Release() {
 
         </div>
 
-        <div>
-          <CheckboxGroup
-            label="What are we validating?"
-          >
-            <Checkbox value="buenos-aires">Buenos Aires</Checkbox>
-            <Checkbox value="sydney">Sydney</Checkbox>
-            <Checkbox value="san-francisco">San Francisco</Checkbox>
-            <Checkbox value="london">London</Checkbox>
-            <Checkbox value="tokyo">Tokyo</Checkbox>
-          </CheckboxGroup>
+        <div className="flex flex-col gap-3">
+          <div className="flex justify-between">
+            <p className="text-[0.875rem] text-gray-500">What are we validating?</p>
+            <Button onClick={onOpenAssumModal} variant="light"><AddIcon size={20} /></Button>
+          </div>
+          <div className="flex flex-col gap-2">
+            {
+              (activeIdea?.steps || [])[currentStep]?.assumptions?.map(assump => (
+                <div key={assump.id}>
+                  <Checkbox value="buenos-aires" defaultSelected color="default" >{assump.content}</Checkbox>
+                </div>
+              )
+              )
+            }
+
+            <div className="flex">
+              <Checkbox></Checkbox>
+
+              <Input
+                type="text"
+                color='primary'
+                name='newAssumption'
+                id='newAssumption'
+                autoFocus
+                size="sm"
+                value={assumption}
+                onValueChange={setAssumption}
+                onKeyDown={addStepAssumption}
+              />
+
+
+            </div>
+          </div>
+
         </div>
 
         <div>
@@ -243,6 +299,26 @@ export default function Release() {
 
         </div>
       </div>
+
+
+      <Modal isOpen={isAssumOpen} onOpenChange={onOpenAssumChange} onClose={onCloseAssum} placement="top">
+        <ModalContent>
+          {(onCloseAssum) => (
+            <>
+              <ModalHeader>
+
+              </ModalHeader>
+              <ModalBody>
+
+                Assumptions sign
+              </ModalBody>
+              <ModalFooter>
+
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
 
       <Modal
         isOpen={isOpen}
@@ -273,7 +349,7 @@ export default function Release() {
                         activeIdea?.steps?.map((step, index) => (
                           <DroppableSection id={`drop-${numberOfSteps - index}`} key={`drop-${numberOfSteps - index}`} index={numberOfSteps - index}>
 
-                            <DraggableInput id={`drag-${numberOfSteps - index}`} index={numberOfSteps - index} onValueChange={(val) => { updateStepsNames(index, val) }} value={step.name} />
+                            <DraggableInput id={`drag-${numberOfSteps - index}`} index={numberOfSteps - index} onValueChange={(val) => { updateStepsNames(index, val) }} value={step.name} onTrashClick={() => removeStep(index)} />
 
 
                           </DroppableSection>
@@ -290,14 +366,6 @@ export default function Release() {
               <ModalFooter>
 
               </ModalFooter>
-              {/* <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
-                  Cancel
-                </Button>
-                <Button color="primary" onPress={onClose}>
-                  Accept
-                </Button>
-              </ModalFooter> */}
             </>
           )}
         </ModalContent>

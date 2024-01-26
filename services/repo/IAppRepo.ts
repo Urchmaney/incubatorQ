@@ -37,7 +37,8 @@ export type Step = {
 export type IdeaStep = Step & {
     status: "done" | "ongoing" | "initial",
     howValidate: string,
-    measuring: string
+    measuring: string,
+    assumptions: StepAssumption[]
 }
 
 export type Idea = {
@@ -73,6 +74,11 @@ export type Invitation = {
     email: string
     idea: string
     ideaId: string
+}
+
+export type StepAssumption = {
+    id: string
+    content: string
 }
 
 export type Assumption = {
