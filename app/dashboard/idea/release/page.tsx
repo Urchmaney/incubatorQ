@@ -6,6 +6,7 @@ import { DragIndicatorIcon } from "@/components/icons/DragIndicatorIcon";
 import { EditIcon } from "@/components/icons/EditIcon";
 import { EyeFilledIcon } from "@/components/icons/EyeFilledIcon";
 import { InfoIcon } from "@/components/icons/InfoIcon";
+import { LoadingIcon } from "@/components/icons/LoadingIcon";
 import { TrashIcon } from "@/components/icons/TrashIcon";
 import { useAuthContext } from "@/services/auth/auth.context";
 import { Idea, IdeaStep, StepAssumption } from "@/services/repo/IAppRepo";
@@ -89,15 +90,16 @@ export default function Release() {
 
   const updateIdeaSteps = (() => {
     let timeoutId: NodeJS.Timeout;
-    return (key: string, value: string) => {
-      const nSteps = activeIdea?.steps || [{ description: "", howValidate: "", measuring: "", name: "Untitled", status: "initial" }];
+    return (idea: Idea, key: string, value: string) => {
+     
+      const nSteps = idea?.steps || [({ description: "", howValidate: "", measuring: "", name: "Untitled", status: "initial" } as IdeaStep)];
       nSteps[currentStep][key as "description" | "howValidate" | "measuring"] = value
-
+      setActiveIdea?.({ ...idea, steps: [...nSteps] } as Idea)
       clearTimeout(timeoutId)
-      setActiveIdea?.({ ...activeIdea, steps: nSteps } as Idea)
+      
       timeoutId = setTimeout(() => {
         // ideaRepo?.updateIdeaProperties(activeIdea?.id || "", { steps: nSteps })
-        setActiveIdea?.({ ...activeIdea, steps: nSteps } as Idea)
+        // setActiveIdea?.({ ...activeIdea, steps: nSteps } as Idea)
         // setActiveIdea?.({...activeIdea, problem } as Idea)
         console.log("updating   ", key, value)
       }, 4000)
@@ -129,7 +131,8 @@ export default function Release() {
   }
 
   const onCloseModal = () => {
-    ideaRepo?.updateIdeaProperties(activeIdea?.id || "", { steps: activeIdea?.steps })
+    ideaRepo?.updateIdeaProperties(activeIdea?.id || "", { steps: activeIdea?.steps });
+    setCurrentStep(0);
     onClose();
   }
 
@@ -188,6 +191,22 @@ export default function Release() {
   };
 
 
+  const changeStepStatus = async (state: "start" | "achieved" | "stop" | "restart") => {
+
+    const nStep = [...(activeIdea?.steps || [])];
+    let val : "done" | "ongoing" | "initial" = "ongoing";
+    if (state === "achieved") {
+      val = "done"
+    } else if (state === "stop") {
+      val = "initial"
+    }
+    nStep[currentStep].status = val;
+    await ideaRepo?.updateIdeaProperties(activeIdea?.id || "", { steps: nStep })
+    setActiveIdea?.({ ...activeIdea, steps: nStep } as Idea)
+    
+  }
+
+
   const numberOfSteps = activeIdea?.steps?.length || 0;
 
   return (
@@ -203,7 +222,7 @@ export default function Release() {
                       {step.name}
                       {step.status === "initial" && <EyeFilledIcon className="" />}
                       {step.status === "done" && <CheckIcon size={15} />}
-                      {step.status === "ongoing" && <InfoIcon size={15} />}
+                      {step.status === "ongoing" && <LoadingIcon size={15} fill={currentStep === i ? "#000": "gray"} />}
                     </p>
                   </BreadcrumbItem>
                 ))
@@ -230,8 +249,16 @@ export default function Release() {
       }
 
 
-      <div className="flex justify-end">
-        <Button>Start</Button>
+      <div className="flex justify-end gap-2">
+        { (activeIdea?.steps || [])[currentStep]?.status === "initial" &&  <Button onClick={() => changeStepStatus("start")}>Start</Button> }
+
+        { (activeIdea?.steps || [])[currentStep]?.status === "ongoing" &&  <Button color="danger" onClick={() => changeStepStatus("stop")}>Stop</Button> }
+
+        { (activeIdea?.steps || [])[currentStep]?.status === "ongoing" &&  <Button color="primary" onClick={() => changeStepStatus("achieved")}>Achieved</Button> }
+
+        { (activeIdea?.steps || [])[currentStep]?.status === "done" &&  <Button color="default" onClick={() => changeStepStatus("restart")}>Restart</Button> }
+
+       
       </div>
 
       <div className="flex flex-col gap-12 ">
@@ -241,7 +268,7 @@ export default function Release() {
             label="Goal"
             labelPlacement="outside"
             defaultValue={activeIdea?.steps?.[currentStep]?.description || ""}
-            onValueChange={(val) => updateIdeaStepsCb("description", val)}
+            onValueChange={(val) => updateIdeaStepsCb(activeIdea!, "description", val)}
             value={activeIdea?.steps?.[currentStep]?.description || ""}
           />
 
@@ -289,7 +316,7 @@ export default function Release() {
           <Textarea
             label="How are we validating ?"
             labelPlacement="outside"
-            onValueChange={(val) => updateIdeaSteps("howValidate", val)}
+            onValueChange={(val) => updateIdeaSteps(activeIdea!, "howValidate", val)}
             defaultValue={activeIdea?.steps?.[currentStep]?.howValidate || ""}
             className="max-w-full"
           />
@@ -301,7 +328,7 @@ export default function Release() {
           <Textarea
             label="How are we measuring success ?"
             labelPlacement="outside"
-            onValueChange={(val) => updateIdeaSteps("measuring", val)}
+            onValueChange={(val) => updateIdeaSteps(activeIdea!, "measuring", val)}
             defaultValue={activeIdea?.steps?.[currentStep]?.measuring || ""}
             className="max-w-full"
           />
