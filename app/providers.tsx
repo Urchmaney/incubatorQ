@@ -11,13 +11,13 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <NextUIProvider navigate={router.push}>
-      <TrackingContextProvider>
+      {/* <TrackingContextProvider> */}
         <AuthContextProvider>
           <IdeaContextProvider>
             {children}
           </IdeaContextProvider>
         </AuthContextProvider>
-      </TrackingContextProvider>
+      {/* </TrackingContextProvider> */}
 
     </NextUIProvider>
   )
