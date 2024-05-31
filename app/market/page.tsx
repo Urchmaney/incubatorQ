@@ -161,7 +161,7 @@ export default function Assumptions() {
                 </div>
 
             </div>
-            <div className="sticky bottom-5 flex justify-end py-2">
+            <div className="fixed bottom-2.5 right-4 flex justify-end py-2">
                 <div className="rounded-full bg-gray-200 p-3 cursor-pointer"><AddIcon size={30} /></div>
             </div>
         </div>
