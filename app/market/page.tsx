@@ -92,13 +92,13 @@ export default function Assumptions() {
                                     </div>
 
                                     <div>
-                                        <p className="flex gap-3">
+                                        <p className="flex gap-3 flex-wrap">
                                             <span className="bg-gray-200 p-1 px-2 rounded-md text-sm">#agriculture</span>
                                             <span className="bg-gray-200 p-1 px-2 rounded-md text-sm">#investment</span>
                                         </p>
                                     </div>
 
-                                    <div className="flex justify-end gap-3">
+                                    <div className="flex justify-end gap-3 flex-wrap">
                                         <Link>View Procedure</Link>
                                         <Button> Comment </Button>
                                         <Button> Send To Email</Button>
@@ -142,13 +142,13 @@ export default function Assumptions() {
                                     </div>
 
                                     <div>
-                                        <p className="flex gap-3">
+                                        <p className="flex gap-3 flex-wrap">
                                             <span className="bg-gray-200 p-1 px-2 rounded-md text-sm">#agriculture</span>
                                             <span className="bg-gray-200 p-1 px-2 rounded-md text-sm">#investment</span>
                                         </p>
                                     </div>
 
-                                    <div className="flex justify-end gap-3">
+                                    <div className="flex flex-wrap justify-end gap-3">
                                         <Link>View Procedure</Link>
                                         <Button> Comment </Button>
                                         <Button> Send To Email</Button>
