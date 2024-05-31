@@ -2,7 +2,7 @@
 import { AddIcon } from "@/components/icons/AddIcon";
 import { SearchIcon } from "@/components/icons/SearchIcon";
 import { BarChart } from "@mui/x-charts";
-import { Avatar, Button, Card, CardBody, Input, Link, Navbar, NavbarContent } from "@nextui-org/react";
+import { Avatar, BreadcrumbItem, Breadcrumbs, Button, Card, CardBody, Input, Link, Navbar, NavbarContent } from "@nextui-org/react";
 
 export default function Assumptions() {
 
@@ -57,7 +57,17 @@ export default function Assumptions() {
                     </NavbarContent>
                 </Navbar>
             </div>
+
             <div className="relative grow overflow-y-scroll no-scrollbar">
+                <div className="sticky top-0 mx-auto w-[80%] z-10">
+                    <Breadcrumbs radius={"full"} variant="solid">
+                        <BreadcrumbItem>All</BreadcrumbItem>
+                        <BreadcrumbItem>Nigerians</BreadcrumbItem>
+                        <BreadcrumbItem>Lagos</BreadcrumbItem>
+                        <BreadcrumbItem>Seller</BreadcrumbItem>
+                    </Breadcrumbs>
+
+                </div>
                 <div className="w-[80%]  mx-auto flex flex-col gap-5 py-8">
                     <div>
                         <Card>
