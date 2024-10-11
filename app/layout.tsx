@@ -19,8 +19,10 @@ export default function RootLayout({
     <html lang="en" className='light'>
       <body className={`${inter.className}`}>
         <Providers>
-          <div className='max-w-5xl mx-auto'>
-            {children}
+          <div className='w-full'>
+            <div className='max-w-5xl mx-auto '>
+              {children}
+            </div>
           </div>
         </Providers>
       </body>
